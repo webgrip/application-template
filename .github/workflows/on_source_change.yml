@@ -51,10 +51,10 @@ jobs:
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     with:
       docker-context: '.'
-      docker-file: './ops/docker/n8n/Dockerfile'
+      docker-file: './ops/docker/application-application/Dockerfile'
       docker-tags: |
-        webgrip/n8n-application:latest
-        webgrip/n8n-application:${{ needs.release.outputs.version }}
+        webgrip/application-application:latest
+        webgrip/application-application:${{ needs.release.outputs.version }}
 
   deploy-application:
     name: 'Deploy'
@@ -69,5 +69,5 @@ jobs:
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     with:
       environment: 'staging'
-      path: './ops/helm/n8n-application'
+      path: './ops/helm/application-application'
       tag: ${{ needs.release.outputs.version }}

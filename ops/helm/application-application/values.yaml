@@ -1,4 +1,4 @@
-namespace: n8n-application
+namespace: application-application
 
 _shared_config:
   hostname: &hostname application.staging.k8s.webgrip.nl

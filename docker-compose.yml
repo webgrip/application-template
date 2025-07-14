@@ -64,11 +64,11 @@ services:
       - certificate-data:/certificate-data:rw
     entrypoint: [ "/app/entrypoint.sh", "${DOMAIN_NAME}", "${SUBDOMAIN}.${DOMAIN_NAME}" ]
 
-  postgres:
+  application-application-postgres:
     build:
       context: .
       dockerfile: ops/docker/postgres/Dockerfile
-    container_name: n8n-postgres
+    container_name: application-application-postgres
     restart: always
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-application-application}
