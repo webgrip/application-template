@@ -1,0 +1,89 @@
+services:
+  application-application:
+    container_name: application-application
+    image: webgrip/application-application:latest
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: ops/docker/application/Dockerfile
+#      target: production
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_started
+    ports:
+      - "127.0.0.1:5678:5678"
+    environment:
+      - SUBDOMAIN=${SUBDOMAIN:-application-application}
+      - DOMAIN_NAME=${DOMAIN_NAME:-webgrip.test}
+    labels:
+      - "traefik.enable=true"
+
+      # -------------------------------
+      # 1) Router for HTTP (port 80)
+      # -------------------------------
+      - "traefik.http.routers.application-application.entrypoints=web"
+      - "traefik.http.routers.application-application.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
+      # This middleware redirects to HTTPS
+      - "traefik.http.routers.application-application.middlewares=redirect-to-https"
+
+      # Define the middleware that redirects HTTP -> HTTPS
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+      # --------------------------------
+      # 2) Router for HTTPS (port 443)
+      # --------------------------------
+      - "traefik.http.routers.application-application-secure.entrypoints=websecure"
+      - "traefik.http.routers.application-application-secure.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.application-application-secure.tls=true"
+
+      # Configure certs (the main domain + wildcard SAN)
+      - "traefik.http.routers.application-application-secure.tls.domains[0].main=${SUBDOMAIN}.${DOMAIN_NAME}"
+      - "traefik.http.routers.application-application-secure.tls.domains[0].sans=*.${DOMAIN_NAME}"
+
+      # Attach this router to the 'application-application' service
+      - "traefik.http.routers.application-application-secure.service=application-application@docker"
+
+      # --------------------------------
+      # 3) Service definition for application-application
+      # --------------------------------
+      - "traefik.http.services.application-application.loadbalancer.server.scheme=http"
+      - "traefik.http.services.application-application.loadbalancer.server.port=5678"
+
+    env_file:
+      - .env
+    volumes:
+      - application-application-data:/data
+
+  application-application-mkcert:
+    container_name: application-application-mkcert
+    image: webgrip/traefik-local-development-mkcert:latest
+    pull_policy: always
+    volumes:
+      - ~/.config/mkcert:/root/.local/share/mkcert:ro
+      - certificate-data:/certificate-data:rw
+    entrypoint: [ "/app/entrypoint.sh", "${DOMAIN_NAME}", "${SUBDOMAIN}.${DOMAIN_NAME}" ]
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ops/docker/postgres/Dockerfile
+    container_name: n8n-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-application-application}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-application-application_password}
+      - POSTGRES_DB=${POSTGRES_DB:-application-application_db}
+    volumes:
+      - application-application-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  application-application-data:
+  application-application-postgres-data:
+  certificate-data:
+    external: true
+
+networks:
+  default:
+    external: true
+    name: webgrip

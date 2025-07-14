@@ -1,0 +1,71 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: application-application-system
+  namespace: webgrip
+  title: application-application System
+  description: |
+    Placeholder description
+  labels:
+    tier: "3"
+  annotations:
+    github.com/project-slug: webgrip/application-application
+    backstage.io/adr-location: docs/adrs
+    backstage.io/techdocs-ref: dir:./docs/techdocs
+    simpleicons.org/icon-slug: n8n
+  tags:
+    - application-application
+  links:
+    - url: https://application-application.webgrip.test/
+      title: Development URL
+      icon: dashboard
+      type: website
+    - url: https://application-application.staging.k8s.webgrip.nl/
+      title: Staging URL
+      icon: dashboard
+      type: website
+    - url: https://github.com/webgrip/application-application
+      title: Source Code
+      icon: github
+      type: source
+spec:
+  owner: group:webgrip/infrastructure
+  domain: webgrip/operations-domain
+  type: product
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: application-application
+  namespace: webgrip
+  title: application
+  description: |
+    Placeholder description
+  labels:
+    tier: "3"
+  annotations:
+    github.com/project-slug: webgrip/application-application
+    backstage.io/techdocs-ref: dir:./docs/techdocs
+    simpleicons.org/icon-slug: n8n
+  tags:
+    - application
+    - nodejs
+    - automation
+  links:
+    - url: https://application-application.webgrip.test/
+      title: Development URL
+      icon: dashboard
+      type: website
+    - url: https://application-application.staging.k8s.webgrip.nl/
+      title: Staging URL
+      icon: dashboard
+      type: website
+    - url: https://github.com/webgrip/application-application
+      title: Source Code
+      icon: github
+      type: source
+spec:
+  type: service
+  lifecycle: development
+  owner: group:webgrip/infrastructure
+  system: application-application-system

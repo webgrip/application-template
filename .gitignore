@@ -1,0 +1,9 @@
+.idea/
+.env
+
+*.tgz
+
+age.agekey
+
+*.dec.yml
+*.dec.yaml
