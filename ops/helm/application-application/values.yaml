@@ -1,8 +1,8 @@
 namespace: application-application
 
 _shared_config:
-  hostname: &hostname application.staging.k8s.webgrip.nl
-  url: &url https://application.staging.k8s.webgrip.nl
+  hostname: &hostname application-application.staging.k8s.webgrip.nl
+  url: &url https://application-application.staging.k8s.webgrip.nl
 
 application:
   enabled: true
@@ -25,23 +25,3 @@ application:
       - secretName: letsencrypt-application-application
         hosts:
           - *hostname
-
-postgresql:
-  architecture: standalone
-
-  auth:
-    username: application
-    database: application_db
-    existingSecret: application-application-secrets
-    secretKeys:
-      userPasswordKey: postgres-password
-
-  metrics:
-    enabled: true
-
-  primary:
-    service:
-      type: ClusterIP
-      ports:
-        postgresql: 5432
-
