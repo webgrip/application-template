@@ -17,6 +17,19 @@ logs:
 enter:
 	docker-compose exec application /bin/sh
 
+init-helm:
+ifndef HELM_CHART_DIR
+	$(error HELM_CHART_DIR is not set. Usage: make helm-import HELM_CHART_DIR=./path/to/chart)
+endif
+	@echo "Initializing Helm chart in $(HELM_CHART_DIR)..."
+	helm dependency update $(HELM_CHART_DIR)
+	helm lint $(HELM_CHART_DIR)
+
+init-encrypt:
+	age-keygen > age.agekey
+	@echo "Generated age key: age.agekey"
+	sed -n 's/^# public key:[[:space:]]*//p' age.agekey > age.pubkey
+
 ## Encrypt values.yaml -> values.sops.yaml in the specified directory
 encrypt-secrets:
 ifndef SECRETS_DIR

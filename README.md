@@ -1,15 +1,7 @@
-# n8n Application
+# Application Template
 
-n8n is an extendable workflow automation tool which enables you to connect anything to everything via its open, fair-code model.
+## Getting Started
 
-## Setup
-```bash
-make start
-``` 
+### Find & Replace all "application-application" instances in the project to
+For example: "application-application" -> "farmos-application". Or "searxng-application".
 
-#### Useful commands
-
-```bash
-# Imports the workflows in the /src/workflows folder
-make import
-```
