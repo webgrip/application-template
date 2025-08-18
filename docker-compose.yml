@@ -9,8 +9,8 @@ services:
 #      target: production
     restart: always
     depends_on:
-      postgres:
-        condition: service_started
+      application-application.postgres:
+        condition: service_healthy
     ports:
       - "127.0.0.1:5678:5678"
     environment:
@@ -83,6 +83,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - application-application-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_BASE}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
 volumes:
   application-application-data:
