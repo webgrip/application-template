@@ -1,5 +1,5 @@
 services:
-  application-application:
+  application-application.application:
     container_name: application-application
     image: webgrip/application-application:latest
     pull_policy: never
@@ -53,9 +53,9 @@ services:
     env_file:
       - .env
     volumes:
-      - application-application-data:/data
+      - application-application-application-data:/data
 
-  application-application-mkcert:
+  application-application.mkcert:
     container_name: application-application-mkcert
     image: webgrip/traefik-local-development-mkcert:latest
     pull_policy: always
@@ -64,16 +64,23 @@ services:
       - certificate-data:/certificate-data:rw
     entrypoint: [ "/app/entrypoint.sh", "${DOMAIN_NAME}", "${SUBDOMAIN}.${DOMAIN_NAME}" ]
 
-  application-application-postgres:
+  application-application.postgres:
+    container_name: application-application-postgres
+    image: webgrip/application-application-postgres:latest
+    pull_policy: never
     build:
       context: .
       dockerfile: ops/docker/postgres/Dockerfile
-    container_name: application-application-postgres
-    restart: always
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    logging:
+      options:
+        max-size: 10m
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-application-application}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-application-application_password}
-      - POSTGRES_DB=${POSTGRES_DB:-application-application_db}
+      POSTGRES_DB: ${DB_BASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - application-application-postgres-data:/var/lib/postgresql/data
 
