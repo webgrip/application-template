@@ -8,3 +8,7 @@ dependencies:
   - name: common-helpers
     repository: oci://ghcr.io/webgrip/common-charts
     version: 1.0.13
+  - name: app-template
+    repository: https://bjw-s-labs.github.io/helm-charts
+    version: 4.2.0
+    alias: app

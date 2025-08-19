@@ -2,5 +2,8 @@ dependencies:
 - name: common-helpers
   repository: oci://ghcr.io/webgrip/common-charts
   version: 1.0.13
-digest: sha256:ff4ce8779d953576676613062176c4013a14cdf04f1c414d899f40bbf9161c2c
-generated: "2025-08-18T22:42:51.098779817+02:00"
+- name: app-template
+  repository: https://bjw-s-labs.github.io/helm-charts
+  version: 4.2.0
+digest: sha256:a6caa64bd6018fa4e74214585d43eb65f83f5b16d8d6b870656c1b78cbd1ecbc
+generated: "2025-08-19T00:24:57.151992157+02:00"

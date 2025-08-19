@@ -51,10 +51,10 @@ jobs:
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     with:
       docker-context: '.'
-      docker-file: './ops/docker/application-application/Dockerfile'
+      docker-file: './ops/docker/application/Dockerfile'
       docker-tags: |
-        webgrip/application-application:latest
-        webgrip/application-application:${{ needs.release.outputs.version }}
+        ${{github.repository_owner}}/${{ github.event.repository.name }}:latest
+        ${{github.repository_owner}}/${{ github.event.repository.name }}:${{ needs.release.outputs.version }}
 
   deploy-application:
     name: 'Deploy'
@@ -69,5 +69,5 @@ jobs:
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     with:
       environment: 'staging'
-      path: './ops/helm/application-application'
+      path: './ops/helm/${{ github.event.repository.name }}'
       tag: ${{ needs.release.outputs.version }}
