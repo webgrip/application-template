@@ -90,7 +90,7 @@ services:
       retries: 20
 
 volumes:
-  application-application-data:
+  application-application-application-data:
   application-application-postgres-data:
   certificate-data:
     external: true
