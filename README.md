@@ -2,17 +2,38 @@
 
 ## Getting Started
 
-### Setting up encrypted values
+### Encrypted secrets
 
-`make init-encrypt` will create 2 files: 
+```bash
+make init-encrypt
+```
 
-- `age.agekey` (Put this in this repository's `SOPS_AGE_KEY`)
-- `age.pubkey`
+Creates:
 
-Put your plaintext values for your k8s secrets in `ops/secrets/application-application-secrets/values.dec.yaml`. You can then use `make encrypt-secrets SECRETS_DIR=./ops/secrets/application-application-secrets` to encrypt the secrets into `values.sops.yaml`, which can be committed. The deployment process will decrypt these values with the aforementioned reporisory secret.
+* `age.agekey` → add to repo secret `SOPS_AGE_KEY`
+* `age.pubkey` → used for encryption
 
-#### Useful commands
+Add plaintext secrets to:
 
-`docker compose up --build`
+```
+ops/secrets/application-application-secrets/values.dec.yaml
+```
 
-`docker compose down --remove-orphans --volumes`
+Encrypt them:
+
+```bash
+make encrypt-secrets SECRETS_DIR=./ops/secrets/application-application-secrets
+```
+
+This produces `values.sops.yaml` (commit this).
+
+---
+
+### Docker
+
+```bash
+docker compose up --build
+docker compose down --remove-orphans --volumes
+```
+
+---
