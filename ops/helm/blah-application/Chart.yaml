@@ -1,5 +1,5 @@
 apiVersion: v2
-name: application-application
+name: blah-application
 description: "Helm Chart for deploying {{application}} on k8s"
 type: application
 version: 0.1.0

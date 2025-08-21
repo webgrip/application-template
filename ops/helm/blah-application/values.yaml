@@ -1,13 +1,13 @@
-namespace: application-application
+namespace: blah-application
 
 _shared_config:
-  hostname: &hostname application-application.staging.k8s.webgrip.nl
-  url: &url https://application-application.staging.k8s.webgrip.nl
+  hostname: &hostname blah-application.staging.k8s.webgrip.nl
+  url: &url https://blah-application.staging.k8s.webgrip.nl
 
 application:
   enabled: true
   image:
-    repository: webgrip/application-application
+    repository: webgrip/blah-application
     tag: latest
     pullPolicy: Always
 
@@ -22,6 +22,6 @@ application:
         paths:
           - "/"
     tls:
-      - secretName: letsencrypt-application-application
+      - secretName: letsencrypt-blah-application
         hosts:
           - *hostname

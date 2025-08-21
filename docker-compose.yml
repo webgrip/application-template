@@ -1,7 +1,7 @@
 services:
-  application-application.application:
-    container_name: application-application
-    image: webgrip/application-application:latest
+  blah-application.application:
+    container_name: blah-application
+    image: webgrip/blah-application:latest
     pull_policy: never
     build:
       context: .
@@ -9,12 +9,12 @@ services:
 #      target: production
     restart: always
     depends_on:
-      application-application.postgres:
+      blah-application.postgres:
         condition: service_healthy
     ports:
       - "127.0.0.1:5678:5678"
     environment:
-      - SUBDOMAIN=${SUBDOMAIN:-application-application}
+      - SUBDOMAIN=${SUBDOMAIN:-blah-application}
       - DOMAIN_NAME=${DOMAIN_NAME:-webgrip.test}
     labels:
       - "traefik.enable=true"
@@ -22,10 +22,10 @@ services:
       # -------------------------------
       # 1) Router for HTTP (port 80)
       # -------------------------------
-      - "traefik.http.routers.application-application.entrypoints=web"
-      - "traefik.http.routers.application-application.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.blah-application.entrypoints=web"
+      - "traefik.http.routers.blah-application.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
       # This middleware redirects to HTTPS
-      - "traefik.http.routers.application-application.middlewares=redirect-to-https"
+      - "traefik.http.routers.blah-application.middlewares=redirect-to-https"
 
       # Define the middleware that redirects HTTP -> HTTPS
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -33,30 +33,30 @@ services:
       # --------------------------------
       # 2) Router for HTTPS (port 443)
       # --------------------------------
-      - "traefik.http.routers.application-application-secure.entrypoints=websecure"
-      - "traefik.http.routers.application-application-secure.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
-      - "traefik.http.routers.application-application-secure.tls=true"
+      - "traefik.http.routers.blah-application-secure.entrypoints=websecure"
+      - "traefik.http.routers.blah-application-secure.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.blah-application-secure.tls=true"
 
       # Configure certs (the main domain + wildcard SAN)
-      - "traefik.http.routers.application-application-secure.tls.domains[0].main=${SUBDOMAIN}.${DOMAIN_NAME}"
-      - "traefik.http.routers.application-application-secure.tls.domains[0].sans=*.${DOMAIN_NAME}"
+      - "traefik.http.routers.blah-application-secure.tls.domains[0].main=${SUBDOMAIN}.${DOMAIN_NAME}"
+      - "traefik.http.routers.blah-application-secure.tls.domains[0].sans=*.${DOMAIN_NAME}"
 
-      # Attach this router to the 'application-application' service
-      - "traefik.http.routers.application-application-secure.service=application-application@docker"
+      # Attach this router to the 'blah-application' service
+      - "traefik.http.routers.blah-application-secure.service=blah-application@docker"
 
       # --------------------------------
-      # 3) Service definition for application-application
+      # 3) Service definition for blah-application
       # --------------------------------
-      - "traefik.http.services.application-application.loadbalancer.server.scheme=http"
-      - "traefik.http.services.application-application.loadbalancer.server.port=5678"
+      - "traefik.http.services.blah-application.loadbalancer.server.scheme=http"
+      - "traefik.http.services.blah-application.loadbalancer.server.port=5678"
 
     env_file:
       - .env
     volumes:
-      - application-application-application-data:/data
+      - blah-blah-application-data:/data
 
-  application-application.mkcert:
-    container_name: application-application-mkcert
+  blah-application.mkcert:
+    container_name: blah-application-mkcert
     image: webgrip/traefik-local-development-mkcert:latest
     pull_policy: always
     volumes:
@@ -64,9 +64,9 @@ services:
       - certificate-data:/certificate-data:rw
     entrypoint: [ "/app/entrypoint.sh", "${DOMAIN_NAME}", "${SUBDOMAIN}.${DOMAIN_NAME}" ]
 
-  application-application.postgres:
-    container_name: application-application-postgres
-    image: webgrip/application-application-postgres:latest
+  blah-application.postgres:
+    container_name: blah-application-postgres
+    image: webgrip/blah-application-postgres:latest
     pull_policy: never
     build:
       context: .
@@ -82,7 +82,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - application-application-postgres-data:/var/lib/postgresql/data
+      - blah-application-postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_BASE}"]
       interval: 5s
@@ -90,8 +90,8 @@ services:
       retries: 20
 
 volumes:
-  application-application-data:
-  application-application-postgres-data:
+  blah-application-data:
+  blah-application-postgres-data:
   certificate-data:
     external: true
 

@@ -47,4 +47,4 @@ endif
 		sops --decrypt $(SECRETS_DIR)/values.sops.yaml > $(SECRETS_DIR)/values.dec.yaml
 
 # expose:
-# 	kubectl -n application-application port-forward service/application-application 8080:8080
+# 	kubectl -n blah-application port-forward service/blah-application 8080:8080
