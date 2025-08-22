@@ -1,5 +1,14 @@
 # application-application
 
+[![Build Status](https://img.shields.io/github/actions/workflow/status/organisation/application-application/test.yml?style=for-the-badge)](https://github.com/organisation/application-application/actions)
+[![License](https://img.shields.io/github/license/organisation/application-application?style=for-the-badge)](LICENSE)
+
+---
+
+## Description
+
+...
+
 ## Getting Started
 
 ### Encrypted secrets

@@ -88,10 +88,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+  
+  application-application.redis:
+    container_name: application-application-redis
+    image: webgrip/application-application-redis:latest
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: ops/docker/redis/Dockerfile
+    restart: always
+    volumes:
+        - application-application-redis-data:/data
+    healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+        start_period: 5s
 
 volumes:
   application-application-application-data:
   application-application-postgres-data:
+  application-application-redis-data:
   certificate-data:
     external: true
 
