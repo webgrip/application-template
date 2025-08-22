@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/webgrip/application-template/compare/1.2.0...1.2.1) (2025-08-22)
+
+
+### Bug Fixes
+
+* webgrip -> organisation ([8cbc56d](https://github.com/webgrip/application-template/commit/8cbc56d3d231e136efc4beceb2a4b259b21d4e01))
+
 # [1.2.0](https://github.com/webgrip/application-template/compare/1.1.0...1.2.0) (2025-08-22)
 
 
