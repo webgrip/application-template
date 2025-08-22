@@ -1,16 +1,11 @@
-# Makefile
-
 .PHONY: start stop logs import
 
-## Start the Docker Compose stack
 start:
 	docker-compose up -d
 
-## Stop the Docker Compose stack
 stop:
 	docker-compose down
 
-## View logs of all services (Ctrl+C to exit)
 logs:
 	docker-compose logs -f
 
@@ -30,7 +25,6 @@ init-encrypt:
 	@echo "Generated age key: age.agekey"
 	sed -n 's/^# public key:[[:space:]]*//p' age.agekey > age.pubkey
 
-## Encrypt values.yaml -> values.sops.yaml in the specified directory
 encrypt-secrets:
 ifndef SECRETS_DIR
 	$(error SECRETS_DIR is not set. Usage: make encrypt-secrets SECRETS_DIR=./path/to/secrets)

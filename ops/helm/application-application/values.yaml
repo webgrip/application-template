@@ -7,7 +7,7 @@ _shared_config:
 application:
   enabled: true
   image:
-    repository: webgrip/application-application
+    repository: organisation/application-application
     tag: latest
     pullPolicy: Always
 
@@ -16,7 +16,7 @@ application:
     className: ingress-traefik
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-traefik
-#      traefik.ingress.kubernetes.io/router.middlewares: "ingress-traefik-ryan-basic-auth@kubernetescrd"
+    #      traefik.ingress.kubernetes.io/router.middlewares: "ingress-traefik-ryan-basic-auth@kubernetescrd"
     hosts:
       - host: *hostname
         paths:

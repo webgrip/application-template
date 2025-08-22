@@ -1,11 +1,11 @@
-site_name: 'application-application TechDocs'
-site_description: ''
+site_name: "application-application TechDocs"
+site_description: ""
 
 theme:
-  name: 'material'
+  name: "material"
   custom_dir: overrides
-  analytics:
-    gtag: G-FAKE
+  # analytics:
+  #   gtag: G-FAKE
   features:
     - search.suggest
     - search.highlight
@@ -39,7 +39,7 @@ plugins:
       indexing: full
   - mermaid2:
       arguments:
-        securityLevel: 'loose'
+        securityLevel: "loose"
   - macros
   - privacy
 
@@ -48,29 +48,29 @@ markdown_extensions:
   - markdown_inline_graphviz
 
 extra:
-  analytics:
-    provider: custom
-    property: G-FAKE
-    feedback:
-      title: Was this page helpful?
-      ratings:
-        - icon: material/emoticon-happy-outline
-          name: This page was helpful
-          data: 1
-          note: >-
-            Thanks for your feedback!
-        - icon: material/emoticon-sad-outline
-          name: This page could be improved
-          data: 0
-          note: >-
-            Thanks for your feedback! Help us improve this page by
-            using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
+  # analytics:
+  #   provider: custom
+  #   property: G-FAKE
+  #   feedback:
+  #     title: Was this page helpful?
+  #     ratings:
+  #       - icon: material/emoticon-happy-outline
+  #         name: This page was helpful
+  #         data: 1
+  #         note: >-
+  #           Thanks for your feedback!
+  #       - icon: material/emoticon-sad-outline
+  #         name: This page could be improved
+  #         data: 0
+  #         note: >-
+  #           Thanks for your feedback! Help us improve this page by
+  #           using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
   consent:
     title: Cookie consent
     description: >-
       We use cookies to gather insights into our site's traffic and to ensure you're able to leave feedback.
       If you do not wish to leave feedback or be tracked, feel free to reject the cookies :)
-      
+
       Thank you for visiting!
     actions:
       - accept
@@ -81,9 +81,9 @@ extra:
       github: Github
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/webgrip
+      link: https://github.com/organisation
   generator: false
 
 copyright: >
-  WebGrip © 2013 - 2025 Building Better Developers  - 
+  organisation © 2013 - 2025 Building Better Developers  - 
   <a href="#__consent">Change cookie settings</a>
