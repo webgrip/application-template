@@ -48,3 +48,6 @@ These thinkers influence our approach to software development, take their philos
 
 #### Secrets & Encryption
 - Encrypted secrets are managed with age/sops. Plaintext secrets live under `ops/secrets/*/values.dec.yaml` and are encrypted with `make encrypt-secrets` (see `README.md`).
+
+## Extra rules
+- Always check to see if the docker-compose.yml output is good before giving it back to the human. If it repeatedly fails, log the output for further analysis and notify the human.
