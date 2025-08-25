@@ -27,14 +27,14 @@ These thinkers influence our approach to software development, take their philos
 - `ops/helm`: Helm chart for deploying the application
 - `ops/secrets`: Helm chart to deploy encrypted secrets for the application to use
 - `src/`: This is where the main application code, or the main subject of the repository, resides
-- `tests/unit`: Unit tests for the application
-- `tests/integration`: Integration tests for the application
-- `tests/functional`: Contract tests for the application
-- `tests/e2e`: End-to-end tests for the application
-- `tests/smoke`: Smoke tests for the application
-- `tests/manual`: Manual tests for the application
-- `tests/performance`: Performance tests for the application
-- `tests/contract`: Security tests for the application
+- `tests/unit`: Unit tests for the application (Test isolated units/classes/components/functions)
+- `tests/integration`: Integration tests for the application (Test the integration of several components)
+- `tests/functional`: Whereas integration tests test the integration of several components, functional tests focus on the functionality of the application as a whole. (Sending requests and asserting responses)
+- `tests/contract`: Contract tests for the application (Test the functionality against the contract)
+- `tests/e2e`: Use a simulated browser environment to interact with the application (Playwright)
+- `tests/smoke`: Tests that verify the basic functionality of the application (eg. health checks, basic API endpoint checks)
+- `tests/manual`: Manual tests for the application. (eg. .http files, Postman collections, OpenAPI specifications)
+- `tests/performance`: Performance tests for the application (JMeter, k6)
 
 ## Code Standards
 - Follow [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) for JavaScript code.
