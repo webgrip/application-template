@@ -14,9 +14,6 @@ services:
         condition: service_healthy
     ports:
       - "127.0.0.1:8080:8080"
-    environment:
-      - SUBDOMAIN=${SUBDOMAIN:-application-application}
-      - DOMAIN_NAME=${DOMAIN_NAME:-webgrip.test}
     labels:
       - "traefik.enable=true"
 
@@ -49,10 +46,30 @@ services:
       # 3) Service definition for application-application
       # --------------------------------
       - "traefik.http.services.application-application.loadbalancer.server.scheme=http"
-      - "traefik.http.services.application-application.loadbalancer.server.port=5678"
+      - "traefik.http.services.application-application.loadbalancer.server.port=8080"
 
     env_file:
       - .env
+    environment:
+      - SUBDOMAIN=${SUBDOMAIN:-invoiceninja-application}
+      - DOMAIN_NAME=${DOMAIN_NAME:-webgrip.test}
+      - APP_ENV=${APP_ENV:-local}
+      - APP_DEBUG=${APP_DEBUG:-true}
+      - DB_HOST=invoiceninja-application.postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_BASE}
+      - DB_USERNAME=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=invoiceninja-application.redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - TZ=${TZ:-UTC}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     volumes:
       - application-application-application-data:/data
 
