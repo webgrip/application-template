@@ -1,16 +1,16 @@
 .PHONY: start stop logs import
 
 start:
-	docker-compose up -d
+	docker compose up -d
 
 stop:
-	docker-compose down
+	docker compose down
 
 logs:
-	docker-compose logs -f
+	docker compose logs -f
 
 enter:
-	docker-compose exec application /bin/sh
+	docker compose exec application-application.application /bin/sh
 
 init-helm:
 ifndef HELM_CHART_DIR

@@ -5,11 +5,12 @@ services:
     pull_policy: never
     build:
       context: .
-      dockerfile: ops/docker/application/Dockerfile
-#      target: production
+      dockerfile: ops/docker/application/Dockerfile=
     restart: always
     depends_on:
       application-application.postgres:
+        condition: service_healthy
+      application-application.redis:
         condition: service_healthy
     ports:
       - "127.0.0.1:8080:8080"
@@ -62,7 +63,8 @@ services:
     volumes:
       - ~/.config/mkcert:/root/.local/share/mkcert:ro
       - certificate-data:/certificate-data:rw
-    entrypoint: [ "/app/entrypoint.sh", "${DOMAIN_NAME}", "${SUBDOMAIN}.${DOMAIN_NAME}" ]
+    entrypoint:
+      ["/app/entrypoint.sh", "${DOMAIN_NAME}", "${SUBDOMAIN}.${DOMAIN_NAME}"]
 
   application-application.postgres:
     container_name: application-application-postgres
@@ -88,7 +90,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-  
+
   application-application.redis:
     container_name: application-application-redis
     image: webgrip/application-application-redis:latest
@@ -98,13 +100,13 @@ services:
       dockerfile: ops/docker/redis/Dockerfile
     restart: always
     volumes:
-        - application-application-redis-data:/data
+      - application-application-redis-data:/data
     healthcheck:
-        test: ["CMD", "redis-cli", "ping"]
-        interval: 30s
-        timeout: 10s
-        retries: 5
-        start_period: 5s
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
 
 volumes:
   application-application-application-data:

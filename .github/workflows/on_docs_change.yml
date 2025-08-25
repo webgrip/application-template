@@ -16,8 +16,15 @@ on:
         default: 'docs/techdocs'
 
 jobs:
-  update-techdocs:
-    name: 'Update TechDocs'
-    uses: webgrip/workflows/.github/workflows/update_techdocs.yml@main
+  generate-documentation:
+    name: 'Generate'
+    uses: webgrip/workflows/.github/workflows/techdocs-generate.yml@main
     with:
       source-dir: ${{ github.event.inputs.source-dir || 'docs/techdocs' }}
+
+  deploy-documentation:
+    name: 'Deploy'
+    uses: webgrip/workflows/.github/workflows/techdocs-deploy-gh-pages.yml@main
+    needs: generate-documentation
+    if: >
+      'refs/heads/main' == ${{ github.ref }}
