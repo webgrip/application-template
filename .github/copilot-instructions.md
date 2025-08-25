@@ -1,7 +1,7 @@
 These are short, actionable rules for an AI coding agent to be immediately productive in this repository.
 
 1) Big picture
-   - This repo builds the `firefly-application` service and supporting infra (see `ops/`, `docker-compose.yml`, `ops/docker/application/Dockerfile`).
+   - This repo builds the `application-application` service and supporting infra (see `ops/`, `docker-compose.yml`, `ops/docker/application/Dockerfile`).
    - Application artifacts are containerized and deployed via helm charts in `ops/helm/` (see `ops/helm/application-application/`).
    - ADRs live in `docs/adr/` and are authoritative for architectural intent — link any change to an ADR when structure is affected.
 
