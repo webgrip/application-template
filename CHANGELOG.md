@@ -1,3 +1,19 @@
+## [1.2.2](https://github.com/webgrip/application-template/compare/1.2.1...1.2.2) (2025-08-26)
+
+
+### Bug Fixes
+
+* Added copilot-instructions.md ([111234e](https://github.com/webgrip/application-template/commit/111234e8d293c43549473940691647ae843a731c))
+* Added env vars to the application docker container, and a healthcheck ([3ed88d8](https://github.com/webgrip/application-template/commit/3ed88d83c8d3d11d7b3d3bfe517aac2d1718f02a))
+* added pull_request_template.md ([9fed0b2](https://github.com/webgrip/application-template/commit/9fed0b20c3b59803ac1533f5ede41b777e4a3239))
+* added some copilot specific stuff ([cbb9f63](https://github.com/webgrip/application-template/commit/cbb9f63b09980d1a1246c57da277a80c106626f1))
+* Added specific copilot instructions for dockerfiles ([48c82a2](https://github.com/webgrip/application-template/commit/48c82a2420361a680f572af1d23f8efe0210bb8e))
+* application ([60e35a5](https://github.com/webgrip/application-template/commit/60e35a5334c2421c91c68642122574886f2a3897))
+* extra rules for copilot ([d7f2218](https://github.com/webgrip/application-template/commit/d7f221825ae66118cff8cef96a56aed519152bc3))
+* slight change in ai files ([d6d3eba](https://github.com/webgrip/application-template/commit/d6d3eba2bffebdb0472269f28724274095a1c8e7))
+* stuff ([bf16c63](https://github.com/webgrip/application-template/commit/bf16c63f43798853feb35c3d2d380da346cc8357))
+* Touch-up ([f6a5f0f](https://github.com/webgrip/application-template/commit/f6a5f0fb6a1316e3df999fd3c786737b02d4acac))
+
 ## [1.2.1](https://github.com/webgrip/application-template/compare/1.2.0...1.2.1) (2025-08-22)
 
 
