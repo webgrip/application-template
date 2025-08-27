@@ -1,11 +1,11 @@
 services:
   application-application.application:
     container_name: application-application
-    image: webgrip/application-application:latest
+    image: organisation/application-application:latest
     pull_policy: never
     build:
       context: .
-      dockerfile: ops/docker/application/Dockerfile=
+      dockerfile: ops/docker/application/Dockerfile
     restart: always
     depends_on:
       application-application.postgres:
@@ -51,16 +51,16 @@ services:
     env_file:
       - .env
     environment:
-      - SUBDOMAIN=${SUBDOMAIN:-invoiceninja-application}
-      - DOMAIN_NAME=${DOMAIN_NAME:-webgrip.test}
+      - SUBDOMAIN=${SUBDOMAIN:-application-application}
+      - DOMAIN_NAME=${DOMAIN_NAME:-organisation.test}
       - APP_ENV=${APP_ENV:-local}
       - APP_DEBUG=${APP_DEBUG:-true}
-      - DB_HOST=invoiceninja-application.postgres
+      - DB_HOST=application-application.postgres
       - DB_PORT=5432
       - DB_DATABASE=${DB_BASE}
       - DB_USERNAME=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - REDIS_HOST=invoiceninja-application.redis
+      - REDIS_HOST=application-application.redis
       - REDIS_PORT=6379
       - REDIS_DB=0
       - TZ=${TZ:-UTC}
@@ -75,7 +75,7 @@ services:
 
   application-application.mkcert:
     container_name: application-application-mkcert
-    image: webgrip/traefik-local-development-mkcert:latest
+    image: organisation/traefik-local-development-mkcert:latest
     pull_policy: always
     volumes:
       - ~/.config/mkcert:/root/.local/share/mkcert:ro
@@ -85,7 +85,7 @@ services:
 
   application-application.postgres:
     container_name: application-application-postgres
-    image: webgrip/application-application-postgres:latest
+    image: organisation/application-application-postgres:latest
     pull_policy: never
     build:
       context: .
@@ -110,7 +110,7 @@ services:
 
   application-application.redis:
     container_name: application-application-redis
-    image: webgrip/application-application-redis:latest
+    image: organisation/application-application-redis:latest
     pull_policy: never
     build:
       context: .
@@ -135,4 +135,4 @@ volumes:
 networks:
   default:
     external: true
-    name: webgrip
+    name: organisation
