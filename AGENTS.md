@@ -35,6 +35,7 @@ These thinkers influence our approach to software development, take their philos
 - `tests/smoke`: Tests that verify the basic functionality of the application (eg. health checks, basic API endpoint checks)
 - `tests/manual`: Manual tests for the application. (eg. .http files, Postman collections, OpenAPI specifications)
 - `tests/performance`: Performance tests for the application (JMeter, k6)
+- `tests/behavioral`: BDD tests for the application (Cucumber, SpecFlow)
 
 ## Code Standards
 - Follow [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) for JavaScript code.
