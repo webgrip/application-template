@@ -1,3 +1,17 @@
+# [1.3.0](https://github.com/webgrip/application-template/compare/1.2.2...1.3.0) (2025-08-27)
+
+
+### Bug Fixes
+
+* added mariadb ([8092175](https://github.com/webgrip/application-template/commit/809217514e8bda52665edd8ecf173e1fc943afe9))
+* env and makefile ([ceb2e0c](https://github.com/webgrip/application-template/commit/ceb2e0cf95d75a74b95d60a8cf72efabcffa5d4d))
+* webgrip -> organisation, and a typo ([319ce6c](https://github.com/webgrip/application-template/commit/319ce6ce86bf30a4f855d9b08425e67121716621))
+
+
+### Features
+
+* Added awesome copilot stuff back in ([cd19ea3](https://github.com/webgrip/application-template/commit/cd19ea36cf36c89c41b7482819200978ef116950))
+
 ## [1.2.2](https://github.com/webgrip/application-template/compare/1.2.1...1.2.2) (2025-08-26)
 
 
