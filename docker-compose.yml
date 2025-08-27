@@ -108,40 +108,40 @@ services:
       timeout: 3s
       retries: 20
 
-  application-application.mariadb:
-    container_name: application-application-mariadb
-    image: organisation/application-application-mariadb:latest
-    build:
-      context: .
-      dockerfile: ops/docker/mariadb/Dockerfile
-    pull_policy: never
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:3306:3306"
-    logging:
-      options:
-        max-size: 10m
-    env_file:
-      - ./.env
-    environment:
-      MARIADB_DATABASE: ${DB_BASE:-ninja}
-      MARIADB_USER: ${DB_USER:-ninja}
-      MARIADB_PASSWORD: ${DB_PASSWORD:-ninja}
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
-      MARIADB_CHARACTER_SET_SERVER: utf8mb4
-      MARIADB_COLLATION_SERVER: utf8mb4_unicode_ci
-    volumes:
-      - application-application-mariadb-data:/var/lib/mysql
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          'mariadb --socket=/var/run/mysqld/mysqld.sock --user="${DB_USER:-}" --password="${DB_PASSWORD:-}" --protocol=TCP --execute="SELECT 1" >/dev/null 2>&1 || exit 1',
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+  # application-application.mariadb:
+  #   container_name: application-application-mariadb
+  #   image: organisation/application-application-mariadb:latest
+  #   build:
+  #     context: .
+  #     dockerfile: ops/docker/mariadb/Dockerfile
+  #   pull_policy: never
+  #   restart: unless-stopped
+  #   ports:
+  #     - "127.0.0.1:3306:3306"
+  #   logging:
+  #     options:
+  #       max-size: 10m
+  #   env_file:
+  #     - ./.env
+  #   environment:
+  #     MARIADB_DATABASE: ${DB_BASE}
+  #     MARIADB_USER: ${DB_USER}
+  #     MARIADB_PASSWORD: ${DB_PASSWORD}
+  #     MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+  #     MARIADB_CHARACTER_SET_SERVER: utf8mb4
+  #     MARIADB_COLLATION_SERVER: utf8mb4_unicode_ci
+  #   volumes:
+  #     - application-application-mariadb-data:/var/lib/mysql
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         'mariadb --socket=/var/run/mysqld/mysqld.sock --user="${DB_USER:-}" --password="${DB_PASSWORD:-}" --protocol=TCP --execute="SELECT 1" >/dev/null 2>&1 || exit 1',
+  #       ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+  #     start_period: 30s
 
   application-application.redis:
     container_name: application-application-redis
@@ -163,6 +163,7 @@ services:
 volumes:
   application-application-application-data:
   application-application-postgres-data:
+  # application-application-mariadb-data:
   application-application-redis-data:
   certificate-data:
     external: true
