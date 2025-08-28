@@ -1,3 +1,21 @@
+# [1.5.0](https://github.com/webgrip/application-template/compare/1.4.0...1.5.0) (2025-08-28)
+
+
+### Bug Fixes
+
+* always install node ([b312ccd](https://github.com/webgrip/application-template/commit/b312ccd5070db19b056a896c4ab5e7a990439401))
+* check node and npx version ([c795b7d](https://github.com/webgrip/application-template/commit/c795b7d90dada68536be57f88ccab2cbb54025f7))
+* comments in .env.example ([bbcf878](https://github.com/webgrip/application-template/commit/bbcf878ace26e27308793507cecd6b4ac9cfe446))
+* **docker:** Set up env vars properly ([55dde39](https://github.com/webgrip/application-template/commit/55dde3973ead10897a1582ef61bf6c6fcbdab6f0))
+* install make and only run npm stuff in copilot setup steps ([faba336](https://github.com/webgrip/application-template/commit/faba33651dc2efc89bba4148ea21c383b44c2706))
+* invoiceninja -> application ([1b3ed0a](https://github.com/webgrip/application-template/commit/1b3ed0a4f21e75d05cb4bf060606b749863e3d29))
+* removed npm cache ([fa05730](https://github.com/webgrip/application-template/commit/fa057306e6d8ba5c1bf7ad599e013ab87bd1c520))
+
+
+### Features
+
+* Got rid of the dockerfile for the application itself, it's important AI does this on its own without something already being there ([aaf4f7d](https://github.com/webgrip/application-template/commit/aaf4f7de71fa451a7c9b8d3311c1424e88eed7d8))
+
 # [1.4.0](https://github.com/webgrip/application-template/compare/1.3.0...1.4.0) (2025-08-28)
 
 
