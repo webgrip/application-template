@@ -14,40 +14,6 @@ services:
         condition: service_healthy
     ports:
       - "127.0.0.1:8080:8080"
-    labels:
-      - "traefik.enable=true"
-
-      # -------------------------------
-      # 1) Router for HTTP (port 80)
-      # -------------------------------
-      - "traefik.http.routers.application-application.entrypoints=web"
-      - "traefik.http.routers.application-application.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
-      # This middleware redirects to HTTPS
-      - "traefik.http.routers.application-application.middlewares=redirect-to-https"
-
-      # Define the middleware that redirects HTTP -> HTTPS
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-
-      # --------------------------------
-      # 2) Router for HTTPS (port 443)
-      # --------------------------------
-      - "traefik.http.routers.application-application-secure.entrypoints=websecure"
-      - "traefik.http.routers.application-application-secure.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)"
-      - "traefik.http.routers.application-application-secure.tls=true"
-
-      # Configure certs (the main domain + wildcard SAN)
-      - "traefik.http.routers.application-application-secure.tls.domains[0].main=${SUBDOMAIN}.${DOMAIN_NAME}"
-      - "traefik.http.routers.application-application-secure.tls.domains[0].sans=*.${DOMAIN_NAME}"
-
-      # Attach this router to the 'application-application' service
-      - "traefik.http.routers.application-application-secure.service=application-application@docker"
-
-      # --------------------------------
-      # 3) Service definition for application-application
-      # --------------------------------
-      - "traefik.http.services.application-application.loadbalancer.server.scheme=http"
-      - "traefik.http.services.application-application.loadbalancer.server.port=8080"
-
     env_file:
       - .env
     environment:
@@ -72,16 +38,6 @@ services:
       start_period: 20s
     volumes:
       - application-application-application-data:/data
-
-  application-application.mkcert:
-    container_name: application-application-mkcert
-    image: organisation/traefik-local-development-mkcert:latest
-    pull_policy: always
-    volumes:
-      - ~/.config/mkcert:/root/.local/share/mkcert:ro
-      - certificate-data:/certificate-data:rw
-    entrypoint:
-      ["/app/entrypoint.sh", "${DOMAIN_NAME}", "${SUBDOMAIN}.${DOMAIN_NAME}"]
 
   application-application.postgres:
     container_name: application-application-postgres
@@ -165,8 +121,6 @@ volumes:
   application-application-postgres-data:
   # application-application-mariadb-data:
   application-application-redis-data:
-  certificate-data:
-    external: true
 
 networks:
   default:
