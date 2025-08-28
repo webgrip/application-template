@@ -19,16 +19,6 @@ services:
     environment:
       - SUBDOMAIN=${SUBDOMAIN:-application-application}
       - DOMAIN_NAME=${DOMAIN_NAME:-organisation.test}
-      - APP_ENV=${APP_ENV:-local}
-      - APP_DEBUG=${APP_DEBUG:-true}
-      - DB_HOST=application-application.postgres
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-}
-      - DB_USERNAME=${DB_USERNAME:-}
-      - DB_PASSWORD=${DB_PASSWORD:-}
-      - REDIS_HOST=application-application.redis
-      - REDIS_PORT=6379
-      - REDIS_DB=0
       - TZ=${TZ:-UTC}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
