@@ -15,7 +15,7 @@ SHELL := /usr/bin/bash
 COMPOSE ?= docker compose
 
 # Services / paths
-APP_SERVICE ?= Application-application.application
+APP_SERVICE ?= application-application.application
 ENV_FILE    ?= .env
 
 # Helm / SOPS / AGE defaults (override at call time if you want)
