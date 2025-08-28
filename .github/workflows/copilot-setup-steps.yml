@@ -33,6 +33,10 @@ jobs:
         with:
           node-version: 24
 
+      - run: |
+          node -v
+          npx -v
+
       - name: Install JS dependencies
         if: ${{ hashFiles('package-lock.json','npm-shrinkwrap.json','yarn.lock', 'pnpm-lock.yaml') != '' }}
         run: npm ci
