@@ -1,3 +1,17 @@
+# [1.4.0](https://github.com/webgrip/application-template/compare/1.3.0...1.4.0) (2025-08-28)
+
+
+### Bug Fixes
+
+* :recycle: Also removed the application docker entrypoint. ([71bbc46](https://github.com/webgrip/application-template/commit/71bbc46b318f4d8bf5655fbc17c2b3dcf5d27a63))
+* fixed mariadb ([7117e53](https://github.com/webgrip/application-template/commit/7117e530fbeae93fa8b2d0f33a02ebe3850faaf5))
+* typo ([9897eb1](https://github.com/webgrip/application-template/commit/9897eb1d36f7c01dbb3deca3e50584935335d31d))
+
+
+### Features
+
+* :recycle: remove mkcert and traefik labels for application image, it's causing AI to go haywire and I'm not using it ([8d2746f](https://github.com/webgrip/application-template/commit/8d2746ff6fbd0e326182751c1ef746e0aa4fa468))
+
 # [1.3.0](https://github.com/webgrip/application-template/compare/1.2.2...1.3.0) (2025-08-27)
 
 
