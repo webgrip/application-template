@@ -1,7 +1,7 @@
 services:
   application-application.application:
-    container_name: application-application
-    image: organisation/application-application:latest
+    container_name: application-application.application
+    image: organisation/application-application.application:latest
     pull_policy: never
     build:
       context: .
@@ -23,15 +23,15 @@ services:
       - APP_DEBUG=${APP_DEBUG:-true}
       - DB_HOST=application-application.postgres
       - DB_PORT=5432
-      - DB_DATABASE=${DB_BASE}
-      - DB_USERNAME=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE:-}
+      - DB_USERNAME=${DB_USERNAME:-}
+      - DB_PASSWORD=${DB_PASSWORD:-}
       - REDIS_HOST=application-application.redis
       - REDIS_PORT=6379
       - REDIS_DB=0
       - TZ=${TZ:-UTC}
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -40,8 +40,8 @@ services:
       - application-application-application-data:/data
 
   application-application.postgres:
-    container_name: application-application-postgres
-    image: organisation/application-application-postgres:latest
+    container_name: application-application.postgres
+    image: organisation/application-application.postgres:latest
     pull_policy: never
     build:
       context: .
@@ -53,20 +53,20 @@ services:
       options:
         max-size: 10m
     environment:
-      POSTGRES_DB: ${DB_BASE}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE:-}
+      POSTGRES_USER: ${DB_USERNAME:-}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-}
     volumes:
       - application-application-postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_BASE}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
       interval: 5s
       timeout: 3s
       retries: 20
 
   # application-application.mariadb:
-  #   container_name: application-application-mariadb
-  #   image: organisation/application-application-mariadb:latest
+  #   container_name: application-application.mariadb
+  #   image: organisation/application-application.mariadb:latest
   #   build:
   #     context: .
   #     dockerfile: ops/docker/mariadb/Dockerfile
@@ -80,10 +80,10 @@ services:
   #   env_file:
   #     - ./.env
   #   environment:
-  #     MARIADB_DATABASE: ${DB_BASE}
-  #     MARIADB_USER: ${DB_USER}
-  #     MARIADB_PASSWORD: ${DB_PASSWORD}
-  #     MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+  #     MARIADB_DATABASE: ${DB_DATABASE:-}
+  #     MARIADB_USER: ${DB_USERNAME:-}
+  #     MARIADB_PASSWORD: ${DB_PASSWORD:-}
+  #     MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-}
   #     MARIADB_CHARACTER_SET_SERVER: utf8mb4
   #     MARIADB_COLLATION_SERVER: utf8mb4_unicode_ci
   #   volumes:
@@ -100,8 +100,8 @@ services:
   #     start_period: 30s
 
   application-application.redis:
-    container_name: application-application-redis
-    image: organisation/application-application-redis:latest
+    container_name: application-application.redis
+    image: organisation/application-application.redis:latest
     pull_policy: never
     build:
       context: .
