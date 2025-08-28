@@ -28,11 +28,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js if a root lockfile exists
+        if: ${{ hashFiles('package-lock.json','npm-shrinkwrap.json','yarn.lock', 'pnpm-lock.yaml') != '' }}
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: 24
+          cache: npm
 
-      - name: Install JavaScript dependencies
+      - name: Install JS dependencies
+        if: ${{ hashFiles('package-lock.json','npm-shrinkwrap.json','yarn.lock', 'pnpm-lock.yaml') != '' }}
         run: npm ci
+
+      - name: Install make
+        run: sudo apt-get install -y make
