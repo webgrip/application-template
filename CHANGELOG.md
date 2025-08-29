@@ -1,3 +1,11 @@
+## [1.5.1](https://github.com/webgrip/application-template/compare/1.5.0...1.5.1) (2025-08-29)
+
+
+### Bug Fixes
+
+* added laravel app key ([36e0551](https://github.com/webgrip/application-template/commit/36e05517d48a6a856683a6bdb2845b601e9d0793))
+* **docker:** fixed something I missed ([dd2153b](https://github.com/webgrip/application-template/commit/dd2153bfe26075bb3ff7efd769d6df9d5a2f809c))
+
 # [1.5.0](https://github.com/webgrip/application-template/compare/1.4.0...1.5.0) (2025-08-28)
 
 
