@@ -171,12 +171,39 @@ wait-ready:  ## Poll a URL until HTTP 200 (URL=...)
 	done; \
 	printf "$(C_ERR)Timeout waiting for %s$(C_RESET)\n" "$$URL"; exit 1
 
+# --- Application key management ----------------------------------------------
+
+## Show application key (non-mutating)
+app-key-show:  ## Show the application key as reported by the app
+	@$(call _req_cmd,$(word 1,$(COMPOSE)))
+	$(COMPOSE) run --rm $(APP_SERVICE) php artisan key:generate --show
+
+## Generate (rotate) application key inside the running app
+app-key-generate:  ## Rotate app key in-container and update dependent state
+	@$(call _req_cmd,$(word 1,$(COMPOSE)))
+	$(COMPOSE) exec $(APP_SERVICE) php artisan key:generate --force
+	$(COMPOSE) exec $(APP_SERVICE) php artisan ninja:update-key
+
+## Generate an APP_KEY and persist to local .env (idempotent)
+app-key-set:  ## Generate APP_KEY and write it to $(ENV_FILE)
+	@$(call _req_cmd,$(word 1,$(COMPOSE)))
+	@printf "$(C_INFO)Generating APP_KEY and updating $(ENV_FILE)...$(C_RESET)\n"
+	@$(call _req_file,$(ENV_FILE))
+	NEW_KEY=$$(docker compose run --rm --no-deps $(APP_SERVICE) php artisan key:generate --show); \
+	if grep -q '^APP_KEY=' $(ENV_FILE); then \
+	  sed -i.bak -E "s|^APP_KEY=.*|APP_KEY=$${NEW_KEY}|" $(ENV_FILE); \
+	  echo "Replaced existing APP_KEY (backup $(ENV_FILE).bak)"; \
+	else \
+	  printf '\nAPP_KEY=%s\n' "$$NEW_KEY" >> $(ENV_FILE); \
+	  echo "Appended APP_KEY to end of $(ENV_FILE)"; \
+	fi;
 
 # --- Phony list ---------------------------------------------------------------
 
 .PHONY: \
   help start stop logs enter run \
   create-user init-helm init-encrypt encrypt-secrets decrypt-secrets \
+  app-key-show app-key-generate app-key-set \
 	wait-ready print-VAR expose
 
 
