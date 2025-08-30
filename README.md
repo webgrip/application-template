@@ -9,6 +9,17 @@
 
 ...
 
+## Template Synchronization
+
+This repository serves as a template that can automatically sync certain files to application repositories. To enable template sync for your application repository, add the `app-template-sync` topic to your repository.
+
+**Synced Files Include:**
+- GitHub workflow files (`.github/workflows/`)
+- Configuration files (`.editorconfig`, `.gitignore`, `.releaserc.json`)
+- Development tools configuration (`.vscode/settings.json`)
+
+For detailed information, see the [Template Sync Documentation](docs/techdocs/template-sync.md).
+
 ## Getting Started
 
 ### Encrypted secrets
