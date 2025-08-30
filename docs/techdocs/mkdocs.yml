@@ -28,6 +28,8 @@ extra_javascript:
 
 nav:
   - Home: index.md
+  - Template Sync: template-sync.md
+  - Workflow Testing: act-testing.md
 
 # https://www.mkdocs.org/user-guide/configuration
 plugins:

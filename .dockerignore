@@ -61,3 +61,7 @@ age.pubkey
 
 # Ignore Makefile backup
 Makefile~
+
+# ACT testing artifacts
+act_output/
+.act_temp/
