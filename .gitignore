@@ -8,6 +8,19 @@ age.agekey
 *.dec.yml
 *.dec.yaml
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.node_repl_history
+*.tsbuildinfo
+.nyc_output
+coverage/
+dist/
+build/
+
 # ACT (local GitHub Actions testing)
 .act_secrets
 .act_temp/
