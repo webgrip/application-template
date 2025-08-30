@@ -20,6 +20,28 @@ This repository serves as a template that can automatically sync certain files t
 
 For detailed information, see the [Template Sync Documentation](docs/techdocs/template-sync.md).
 
+## Workflow Testing
+
+This repository includes comprehensive testing support for GitHub Actions workflows using [ACT](https://github.com/nektos/act), allowing you to test workflows locally without pushing to GitHub.
+
+### Quick Start with ACT
+
+```bash
+# Setup ACT and testing environment
+make setup-act
+
+# Configure your GitHub token in .act_secrets
+# (copy from .act_secrets.example and add your token)
+
+# Test the template sync workflow
+make test-sync-workflow
+
+# Test all workflows
+make test-workflows
+```
+
+For detailed testing documentation, see [Workflow Testing with ACT](docs/techdocs/docs/act-testing.md).
+
 ## Getting Started
 
 ### Encrypted secrets
