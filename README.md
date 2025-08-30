@@ -11,7 +11,7 @@
 
 ## Template Synchronization
 
-This repository serves as a template that can automatically sync certain files to application repositories. To enable template sync for your application repository, add the `app-template-sync` topic to your repository.
+This repository serves as a template that can automatically sync certain files to application repositories. To enable template sync for your application repository, add the `application` topic to your repository.
 
 **Synced Files Include:**
 - GitHub workflow files (`.github/workflows/`)

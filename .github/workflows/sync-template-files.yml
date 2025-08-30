@@ -15,9 +15,9 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'GitHub topic to filter repositories (default: app-template-sync)'
+        description: 'GitHub topic to filter repositories (default: application)'
         required: false
-        default: 'app-template-sync'
+        default: 'application'
       dry_run:
         description: 'Perform a dry run without making changes'
         required: false
@@ -45,7 +45,7 @@ jobs:
         id: find-repos
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TOPIC: ${{ github.event.inputs.topic || 'app-template-sync' }}
+          TOPIC: ${{ github.event.inputs.topic || 'application' }}
         run: |
           echo "Finding repositories with topic: $TOPIC"
           
@@ -68,7 +68,7 @@ jobs:
               }
             }
           ' -f org="${{ github.repository_owner }}" -f topic="$TOPIC" \
-          --jq '.data.organization.repositories.nodes[] | select(.repositoryTopics.nodes[].topic.name == "'$TOPIC'") | .name')
+          --jq '.data.organization.repositories.nodes[] | select(.repositoryTopics.nodes[].topic.name == "'"$TOPIC"'") | .name')
           
           if [ -z "$REPOS" ]; then
             echo "No repositories found with topic: $TOPIC"
@@ -126,7 +126,7 @@ jobs:
           gh repo clone "$ORG/$REPO_NAME" .
           
           # Check if there's already a sync branch
-          BRANCH_NAME="template-sync-$(date +%Y%m%d-%H%M%S)"
+          BRANCH_NAME="feat/sync-template-files-$(date +%Y%m%d-%H%M%S)"
           git checkout -b "$BRANCH_NAME"
           
           CHANGES_MADE=false
@@ -180,17 +180,18 @@ jobs:
             git config user.name "Template Sync Bot"
             git config user.email "noreply@github.com"
             git commit -m "feat: sync template files from $TEMPLATE_REPO
-            
-            This automated pull request syncs template files from the application template repository.
-            
-            Files updated:
-            - Workflow files (.github/workflows/)
-            - Configuration files (.editorconfig, .gitignore, .releaserc.json)
-            - VSCode settings (.vscode/settings.json)
-            
-            Please review the changes and merge if appropriate.
-            
-            Source: $TEMPLATE_REPO@${{ github.sha }}"
+
+Automated synchronization of template files to maintain consistency.
+
+Files synchronized:
+- Workflow files (.github/workflows/)
+- Configuration files (.editorconfig, .gitignore, .releaserc.json)  
+- VSCode settings (.vscode/settings.json)
+
+⚠️  IMPORTANT: Template changes take precedence over local modifications.
+Review this PR carefully to preserve any repository-specific customizations.
+
+Source: $TEMPLATE_REPO@${{ github.sha }}"
             
             git push origin "$BRANCH_NAME"
             
@@ -205,15 +206,23 @@ jobs:
             - Configuration files (`.editorconfig`, `.gitignore`, `.releaserc.json`)
             - VSCode settings (`.vscode/settings.json`)
 
+            ## ⚠️ Conflict Handling
+            **Important**: Template files take precedence over local modifications. If you have made customizations to any of these files, they will be overwritten by the template version.
+
+            **Before merging**:
+            1. Review each changed file carefully
+            2. Identify any repository-specific customizations that need to be preserved
+            3. Either modify this PR or make follow-up changes to restore necessary customizations
+
             ## Review Instructions
-            Please review the changes to ensure they are compatible with your application-specific customizations.
+            Please review the changes to ensure they are compatible with your application-specific requirements.
 
             ## Source
             Template Repository: \`$TEMPLATE_REPO\`
             Template Commit: \`${{ github.sha }}\`
             
             ## Automated Sync
-            This PR was created automatically by the template sync workflow. If you don't want to receive these updates, remove the \`app-template-sync\` topic from your repository." \
+            This PR was created automatically by the template sync workflow. If you don't want to receive these updates, remove the \`application\` topic from your repository." \
               --head "$BRANCH_NAME" \
               --base "main"
               
@@ -242,12 +251,12 @@ jobs:
         run: |
           if [ '${{ steps.find-repos.outputs.repos }}' = '[]' ]; then
             echo "## Summary" >> $GITHUB_STEP_SUMMARY
-            echo "No repositories found with topic: ${{ github.event.inputs.topic || 'app-template-sync' }}" >> $GITHUB_STEP_SUMMARY
+            echo "No repositories found with topic: ${{ github.event.inputs.topic || 'application' }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "To enable template sync for a repository, add the \`app-template-sync\` topic to it." >> $GITHUB_STEP_SUMMARY
+            echo "To enable template sync for a repository, add the \`application\` topic to it." >> $GITHUB_STEP_SUMMARY
           else
             echo "## Summary" >> $GITHUB_STEP_SUMMARY
-            echo "Template sync completed for repositories with topic: ${{ github.event.inputs.topic || 'app-template-sync' }}" >> $GITHUB_STEP_SUMMARY
+            echo "Template sync completed for repositories with topic: ${{ github.event.inputs.topic || 'application' }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### Processed Repositories:" >> $GITHUB_STEP_SUMMARY
             echo '${{ steps.find-repos.outputs.repos }}' | jq -r '.[]' | while read -r repo; do

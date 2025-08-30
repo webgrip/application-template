@@ -36,9 +36,9 @@ The following files are automatically synchronized from the template to target r
 
 To enable template sync for an application repository:
 
-1. **Add the topic**: Add the `app-template-sync` topic to your repository
+1. **Add the topic**: Add the `application` topic to your repository
    - Go to your repository settings
-   - In the "Topics" section, add `app-template-sync`
+   - In the "Topics" section, add `application`
    - Save the changes
 
 2. **Initial sync**: The next time the template repository is updated, your repository will receive a pull request with the synced files
@@ -57,31 +57,40 @@ You can manually trigger a sync from the template repository:
 2. Select the "Sync Template Files to Application Repos" workflow
 3. Click "Run workflow"
 4. Optionally specify:
-   - **Topic**: Custom topic to filter repositories (default: `app-template-sync`)
+   - **Topic**: Custom topic to filter repositories (default: `application`)
    - **Dry run**: Preview what would be synced without making changes
 
 ## Customization and Conflicts
 
 ### Handling Conflicts
 
+⚠️ **Important**: Template files take precedence over local modifications.
+
 When template files are synced:
-1. A new branch is created in the target repository
-2. Template files are copied, preserving any existing customizations not in conflict
-3. A pull request is created for review
-4. Repository maintainers can review and merge the changes as appropriate
+1. A new branch is created in the target repository (using semantic branch naming: `feat/sync-template-files-YYYYMMDD-HHMMSS`)
+2. Template files completely replace the existing files in the target repository
+3. A pull request is created for review with detailed conflict information
+4. Repository maintainers must review carefully to identify and restore any necessary customizations
+
+**What happens with conflicts:**
+- If you've modified `.editorconfig` in your application repository
+- And the template repository's `.editorconfig` is also updated
+- The template version will **completely replace** your local version
+- Your local changes will be visible in the PR diff, allowing you to restore them if needed
 
 ### Repository-Specific Customizations
 
 If you need to customize template files for specific repositories:
 
-1. **Review the PR**: When a sync PR is created, review the changes carefully
-2. **Modify as needed**: Make any necessary modifications in the PR or after merging
-3. **Document customizations**: Consider documenting why certain customizations were made
+1. **Review the PR carefully**: When a sync PR is created, examine the diff to see what local changes will be lost
+2. **Preserve customizations**: Either modify the PR to include your customizations or restore them after merging
+3. **Document customizations**: Consider documenting why certain customizations were made to make future reviews easier
+4. **Consider alternatives**: For significant customizations, consider whether the file should be excluded from future syncs
 
 ### Opting Out
 
 To stop receiving template sync updates:
-1. Remove the `app-template-sync` topic from your repository
+1. Remove the `application` topic from your repository
 2. Existing sync PRs can be closed without merging
 
 ## Workflow Configuration
@@ -97,7 +106,7 @@ The sync workflow is defined in `.github/workflows/sync-template-files.yml` and 
 
 ### No Repositories Found
 If the workflow reports "No repositories found":
-- Verify the `app-template-sync` topic is added to target repositories
+- Verify the `application` topic is added to target repositories
 - Check that repositories are in the same organization as the template
 - Ensure the GitHub token has sufficient permissions
 
@@ -109,9 +118,10 @@ If sync fails for a specific repository:
 
 ### Customizations Lost
 If repository-specific customizations are overwritten:
-- The changes should be visible in the PR diff
-- Restore customizations by modifying the PR before merging
-- Consider documenting customizations for future reference
+- The lost changes should be visible in the PR diff for easy identification
+- Restore customizations by modifying the PR before merging or making follow-up commits
+- Consider documenting important customizations for future reference
+- For frequently customized files, consider whether they should remain in the sync list
 
 ## Example Use Cases
 
