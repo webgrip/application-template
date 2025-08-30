@@ -4,7 +4,7 @@ This repository includes support for testing GitHub Actions workflows locally us
 
 ## Quick Start
 
-1. **Setup ACT**: Install ACT and create local configuration
+1. **Setup ACT**: Build ACT Docker image and create local configuration
    ```bash
    make setup-act
    ```
@@ -25,10 +25,17 @@ This repository includes support for testing GitHub Actions workflows locally us
    make test-workflows
    ```
 
+## Prerequisites
+
+- **Docker**: ACT runs workflows in Docker containers, so Docker must be installed and running
+- **GitHub Token**: A personal access token with `repo` permissions for API access
+
 ## Available Testing Commands
 
 ### Setup and Configuration
-- `make setup-act` - Install ACT and setup testing environment
+- `make build-act` - Build ACT Docker image locally
+- `make setup-act` - Build ACT Docker image and setup testing environment
+- `make validate-act` - Validate ACT configuration and dependencies
 - `make list-workflows` - List all available workflows for testing
 
 ### Testing Workflows
@@ -82,15 +89,19 @@ make test-sync-push
 This simulates a push event that would trigger the workflow when template files are modified.
 
 ### 3. Custom Testing
-You can run ACT directly with custom parameters:
+You can run ACT directly with custom parameters using the local Docker image:
 ```bash
 # Test with specific workflow file
-act workflow_dispatch \
+docker run --rm -v $(PWD):/workspace -w /workspace \
+  --secret-file .act_secrets --env-file .act_env \
+  application-template-act:latest workflow_dispatch \
   --eventpath .github/act-events/workflow-dispatch-custom-topic.json \
   --workflows .github/workflows/sync-template-files.yml
 
 # Test with specific event
-act push \
+docker run --rm -v $(PWD):/workspace -w /workspace \
+  --secret-file .act_secrets --env-file .act_env \
+  application-template-act:latest push \
   --eventpath .github/act-events/push-template-files.json
 ```
 
@@ -99,14 +110,17 @@ act push \
 ### Common Issues
 
 1. **Missing GitHub token**: Make sure `.act_secrets` contains a valid `GITHUB_TOKEN`
-2. **Docker not running**: ACT requires Docker to be running
-3. **Large runner images**: First run downloads ~1GB of runner images
-4. **API rate limits**: Use a GitHub token to avoid API rate limiting
+2. **Docker not running**: ACT requires Docker to be running  
+3. **ACT image not built**: Run `make setup-act` to build the ACT Docker image
+4. **Large runner images**: First run downloads ~1GB of runner images
+5. **API rate limits**: Use a GitHub token to avoid API rate limiting
 
 ### Debug Mode
 Run ACT with verbose output for debugging:
 ```bash
-act --verbose workflow_dispatch \
+docker run --rm -v $(PWD):/workspace -w /workspace \
+  --secret-file .act_secrets --env-file .act_env \
+  application-template-act:latest --verbose workflow_dispatch \
   --eventpath .github/act-events/workflow-dispatch-dry-run.json
 ```
 
@@ -150,17 +164,24 @@ Create custom event files in `.github/act-events/` for specific test scenarios:
 ### Environment Variable Overrides
 Override environment variables for specific tests:
 ```bash
-act workflow_dispatch \
-  --env GITHUB_REPOSITORY=myorg/myrepo \
-  --env CUSTOM_VAR=test-value
+docker run --rm -v $(PWD):/workspace -w /workspace \
+  --secret-file .act_secrets --env-file .act_env \
+  -e GITHUB_REPOSITORY=myorg/myrepo \
+  -e CUSTOM_VAR=test-value \
+  application-template-act:latest workflow_dispatch
 ```
 
 ### Multiple Workflow Testing
 Test multiple workflows in sequence:
 ```bash
 # Test specific workflows only
-act push --workflows .github/workflows/sync-template-files.yml
-act push --workflows .github/workflows/on_docs_change.yml
+docker run --rm -v $(PWD):/workspace -w /workspace \
+  --secret-file .act_secrets --env-file .act_env \
+  application-template-act:latest push --workflows .github/workflows/sync-template-files.yml
+
+docker run --rm -v $(PWD):/workspace -w /workspace \
+  --secret-file .act_secrets --env-file .act_env \
+  application-template-act:latest push --workflows .github/workflows/on_docs_change.yml
 ```
 
 ## Resources

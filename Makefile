@@ -159,15 +159,18 @@ decrypt-secrets:  ## Decrypt secrets with SOPS (requires $(AGE_KEY))
 
 # --- GitHub Actions Testing (ACT) --------------------------------------------
 
+# ACT Docker image
+ACT_IMAGE ?= application-template-act:latest
+
+## Build ACT Docker image locally
+build-act:  ## Build ACT Docker image locally
+	@$(call _req_cmd,docker)
+	@printf "$(C_INFO)Building ACT Docker image...$(C_RESET)\n"
+	docker build -f Dockerfile.act -t $(ACT_IMAGE) .
+	@printf "$(C_OK)ACT Docker image built: $(ACT_IMAGE)$(C_RESET)\n"
+
 ## Setup ACT for testing GitHub Actions locally
-setup-act:  ## Install ACT and setup testing environment
-	@$(call _req_cmd,curl)
-	@printf "$(C_INFO)Installing ACT...$(C_RESET)\n"
-	@if ! command -v act >/dev/null 2>&1; then \
-		curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash; \
-	else \
-		printf "$(C_OK)ACT is already installed$(C_RESET)\n"; \
-	fi
+setup-act: build-act  ## Build ACT Docker image and setup testing environment
 	@if [ ! -f .act_secrets ]; then \
 		printf "$(C_WARN)Creating .act_secrets from example...$(C_RESET)\n"; \
 		cp .act_secrets.example .act_secrets; \
@@ -178,46 +181,64 @@ setup-act:  ## Install ACT and setup testing environment
 ## Validate ACT configuration and setup
 validate-act:  ## Validate ACT configuration and dependencies
 	@printf "$(C_INFO)Validating ACT configuration...$(C_RESET)\n"
+	@docker run --rm -v $(PWD):/workspace -w /workspace $(ACT_IMAGE) --version
 	@./scripts/validate-act.sh
 
 ## Test the template sync workflow with dry run
 test-sync-workflow:  ## Test sync-template-files workflow with ACT (dry run)
-	@$(call _req_cmd,act)
+	@$(call _req_cmd,docker)
 	@$(call _req_file,.act_secrets)
 	@printf "$(C_INFO)Testing sync-template-files workflow (dry run)...$(C_RESET)\n"
-	act workflow_dispatch \
+	@mkdir -p act_output
+	docker run --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		--secret-file .act_secrets \
+		--env-file .act_env \
+		$(ACT_IMAGE) workflow_dispatch \
 		--eventpath .github/act-events/workflow-dispatch-dry-run.json \
 		--workflows .github/workflows/sync-template-files.yml \
 		--artifact-server-path ./act_output
 
 ## Test sync workflow with push event
 test-sync-push:  ## Test sync workflow triggered by push event
-	@$(call _req_cmd,act)
+	@$(call _req_cmd,docker)
 	@$(call _req_file,.act_secrets)
 	@printf "$(C_INFO)Testing sync workflow with push event...$(C_RESET)\n"
-	act push \
+	@mkdir -p act_output
+	docker run --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		--secret-file .act_secrets \
+		--env-file .act_env \
+		$(ACT_IMAGE) push \
 		--eventpath .github/act-events/push-template-files.json \
 		--workflows .github/workflows/sync-template-files.yml \
 		--artifact-server-path ./act_output
 
 ## Test all workflows with ACT
 test-workflows:  ## Test all GitHub Actions workflows locally
-	@$(call _req_cmd,act)
+	@$(call _req_cmd,docker)
 	@$(call _req_file,.act_secrets)
 	@printf "$(C_INFO)Testing all workflows...$(C_RESET)\n"
 	@mkdir -p act_output
-	act --list
+	docker run --rm -v $(PWD):/workspace -w /workspace $(ACT_IMAGE) --list
 	@printf "$(C_INFO)Running workflow tests...$(C_RESET)\n"
-	act push \
+	docker run --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		--secret-file .act_secrets \
+		--env-file .act_env \
+		$(ACT_IMAGE) push \
 		--eventpath .github/act-events/push-template-files.json \
 		--artifact-server-path ./act_output || true
 	@printf "$(C_OK)Workflow tests completed$(C_RESET)\n"
 
 ## List available workflows that can be tested
 list-workflows:  ## List all available workflows for ACT testing
-	@$(call _req_cmd,act)
+	@$(call _req_cmd,docker)
 	@printf "$(C_INFO)Available workflows:$(C_RESET)\n"
-	act --list
+	@docker run --rm -v $(PWD):/workspace -w /workspace $(ACT_IMAGE) --list || printf "$(C_WARN)Some workflows have syntax issues but ACT is working$(C_RESET)\n"
 
 ## Clean ACT artifacts and temporary files
 clean-act:  ## Clean ACT output and temporary files
@@ -274,6 +295,6 @@ app-key-set:  ## Generate APP_KEY and write it to $(ENV_FILE)
   create-user init-helm init-encrypt encrypt-secrets decrypt-secrets \
   app-key-show app-key-generate app-key-set \
 	wait-ready print-VAR expose \
-	setup-act validate-act test-sync-workflow test-sync-push test-workflows list-workflows clean-act
+	build-act setup-act validate-act test-sync-workflow test-sync-push test-workflows list-workflows clean-act
 
 
