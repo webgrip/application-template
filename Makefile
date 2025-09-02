@@ -18,9 +18,19 @@ ACT_IMAGE ?= webgrip/act-runner:latest
 # Default maps 'arc-runner-set' to the nektos act Ubuntu environment (change if you prefer another image).
 ACT_RUNNER_PLATFORM ?= arc-runner-set=ghcr.io/catthehacker/ubuntu:act-latest
 
-# Services / paths
-APP_SERVICE ?= application-application.application
-ENV_FILE    ?= .env
+# Services / paths ----------------------------------------------------------------
+# APP_NAME / NAMESPACE let you quickly adapt this Makefile across similar Laravel apps.
+# For an invoiceninja style deployment set, for example:
+#   make expose NAMESPACE=invoiceninja-application SERVICE_NAME=invoiceninja-application REMOTE_PORT=80
+APP_NAME      ?= application-application
+NAMESPACE     ?= $(APP_NAME)
+SERVICE_NAME  ?= $(APP_NAME)
+APP_SERVICE   ?= $(APP_NAME).application
+ENV_FILE      ?= .env
+
+# Port-forward defaults (override per invocation):
+LOCAL_PORT    ?= 8080
+REMOTE_PORT   ?= 8080
 
 # Helm / SOPS / AGE defaults (override at call time if you want)
 HELM_CHART_DIR ?=
@@ -104,11 +114,12 @@ run:
 
 # --- Kubernetes commands ---------------------------------------------------
 
-## Port forward application service
-expose: ## Expose application service
+## Port forward service (override NAMESPACE, SERVICE_NAME, LOCAL_PORT, REMOTE_PORT)
+expose: ## Expose k8s service (LOCAL_PORT:REMOTE_PORT) for $(SERVICE_NAME) in $(NAMESPACE)
 	@$(call _req_cmd,kubectl)
-	kubectl -n application-application port-forward service/application-application 8080:8080
-	@printf "$(C_OK)Port forwarded to http://localhost:8080$(C_RESET)\n"
+	@printf "$(C_INFO)Port-forwarding %s/%s %s -> %s ...$(C_RESET)\n" "$(NAMESPACE)" "$(SERVICE_NAME)" "$(LOCAL_PORT)" "$(REMOTE_PORT)"
+	kubectl -n $(NAMESPACE) port-forward service/$(SERVICE_NAME) $(LOCAL_PORT):$(REMOTE_PORT)
+	@printf "$(C_OK)Port forwarded: http://localhost:%s -> %s/%s:%s$(C_RESET)\n" "$(LOCAL_PORT)" "$(NAMESPACE)" "$(SERVICE_NAME)" "$(REMOTE_PORT)"
 
 # --- Helm workflow ------------------------------------------------------------
 
@@ -163,8 +174,7 @@ decrypt-secrets:  ## Decrypt secrets with SOPS (requires $(AGE_KEY))
 
 # --- GitHub Actions Testing (ACT) --------------------------------------------
 
-# ACT Docker image
-ACT_IMAGE ?= webgrip/act-runner:latest
+# (ACT_IMAGE defined above in core config section)
 
 ## Build ACT Docker image locally
 build-act:  ## Build ACT Docker image locally
@@ -295,12 +305,23 @@ app-key-set:  ## Generate APP_KEY and write it to $(ENV_FILE)
 	  echo "Appended APP_KEY to end of $(ENV_FILE)"; \
 	fi;
 
+# --- App bootstrap -----------------------------------------------------------
+
+## Create an admin user (EMAIL, PASS envs optional; command uses ninja:create-account)
+create-user: ## Create user (override EMAIL=user@example.com PASS=pass)
+	@$(call _req_cmd,$(word 1,$(COMPOSE)))
+	: $${EMAIL:=admin@example.com}; \
+	: $${PASS:=password}; \
+	printf "$(C_INFO)Creating user %s...$(C_RESET)\n" "$$EMAIL"; \
+	$(COMPOSE) exec $(APP_SERVICE) php artisan ninja:create-account --email="$$EMAIL" --password="$$PASS"; \
+	printf "$(C_OK)Created user %s$(C_RESET)\n" "$$EMAIL"
+
 # --- Phony list ---------------------------------------------------------------
 
 .PHONY: \
-  help start stop logs enter run \
-  create-user init-helm init-encrypt encrypt-secrets decrypt-secrets \
-  app-key-show app-key-generate app-key-set \
+	help start stop logs enter run \
+	create-user init-helm init-encrypt encrypt-secrets decrypt-secrets \
+	app-key-show app-key-generate app-key-set \
 	wait-ready print-VAR expose \
 	build-act setup-act validate-act test-sync-workflow test-sync-push test-workflows list-workflows clean-act
 
