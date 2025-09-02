@@ -110,18 +110,6 @@ services:
       retries: 5
       start_period: 5s
 
-  application-application.act:
-    container_name: application-application.act
-    image: webgrip/act-runner:latest
-    pull_policy: never
-    build:
-      context: .
-      dockerfile: Dockerfile.act
-    restart: never
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/github/workspace
-
 volumes:
   application-application-application-data:
   application-application-postgres-data:

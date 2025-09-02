@@ -29,7 +29,6 @@ extra_javascript:
 nav:
   - Home: index.md
   - Template Sync: template-sync.md
-  - Workflow Testing: act-testing.md
 
 # https://www.mkdocs.org/user-guide/configuration
 plugins:
@@ -87,5 +86,5 @@ extra:
   generator: false
 
 copyright: >
-  organisation © 2013 - 2025 Building Better Developers  - 
+  organisation © 2013 - 2025 Building Better Developers  -
   <a href="#__consent">Change cookie settings</a>

@@ -21,7 +21,4 @@ coverage/
 dist/
 build/
 
-# ACT (local GitHub Actions testing)
-.act_secrets
-.act_temp/
-act_output/
+

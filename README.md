@@ -6,7 +6,6 @@
 [![License](https://img.shields.io/github/license/webgrip/application-template?style=flat-square)](LICENSE)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-orange.svg?style=flat-square)](https://www.conventionalcommits.org)
 [![SemVer](https://img.shields.io/badge/semver-2.0.0-blue?style=flat-square)](https://semver.org)
-[![Local CI (ACT)](https://img.shields.io/badge/Local%20CI-ACT-1f425f?style=flat-square)](https://github.com/nektos/act)
 [![Dockerized](https://img.shields.io/badge/containerized-docker-2496ED?logo=docker&logoColor=white&style=flat-square)](https://www.docker.com/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/webgrip/application-template/issues)
 
@@ -18,7 +17,7 @@
 
 | Aspect | What You Get |
 | ------ | ------------- |
-| CI/CD  | Reproducible local workflow testing via ACT + GitHub Actions pipelines |
+| CI/CD  | GitHub Actions pipelines & template sync |
 | Consistency | Automatic sync of core config & workflow files to app repos (opt‑in via topic) |
 | Quality | Conventional Commits + Semantic Versioning scaffolding |
 | Documentation | TechDocs-ready structure for internal/platform portals |
@@ -28,7 +27,7 @@
 ## Features
 
 - Automated template file synchronization (opt‑in per repo by GitHub topic)
-- Local CI parity using Docker + ACT (fast feedback loops)
+// Removed ACT local CI support
 - Semantic release readiness (`.releaserc.json` included)
 - Encrypted secrets workflow (age / SOPS)
 - Curated GitHub workflow set (docs changes, source changes)
@@ -55,35 +54,6 @@ These represent the "source of truth"; local divergent changes in target repos w
 
 For detailed information, see the [Template Sync Documentation](docs/techdocs/template-sync.md).
 
-## Workflow Testing
-
-This repository includes comprehensive testing support for GitHub Actions workflows using [ACT](https://github.com/nektos/act), allowing you to test workflows locally without pushing to GitHub.
-
-### Quick Start with ACT
-
-```bash
-# Setup ACT and testing environment
-make setup-act
-
-# Configure your GitHub token in .act_secrets
-# (copy from .act_secrets.example and add your token)
-
-# Test the template sync workflow
-make test-sync-workflow
-
-# Test all workflows
-make test-workflows
-```
-
-For detailed testing documentation, see [Workflow Testing with ACT](docs/techdocs/docs/act-testing.md).
-
-### Troubleshooting
-
-| Symptom | Suggestion |
-| ------- | ---------- |
-| Workflow fails locally but passes on GitHub | Ensure ACT image parity & check for missing secrets in `.act_secrets` |
-| Template sync finds zero repos | Confirm the target repos have the `application` topic & token scope includes `read:org` |
-| Secrets encryption errors | Run `make init-encrypt` first; verify `SOPS_AGE_KEY` in CI |
 
 ## Getting Started
 
