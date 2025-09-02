@@ -115,7 +115,7 @@ echo "✅ Sync workflow file found"
 # Test ACT can list workflows
 echo "🔍 Testing ACT workflow listing..."
 set +e  # Temporarily disable exit on error
-WORKFLOW_LIST_OUTPUT=$(docker run --rm -v "$(pwd):/workspace" -w /workspace "$ACT_IMAGE" --list 2>&1)
+WORKFLOW_LIST_OUTPUT=$(docker run --rm -v "$(pwd):/workspace" -w /workspace "$ACT_IMAGE" act --list 2>&1)
 WORKFLOW_LIST_EXIT_CODE=$?
 set -e  # Re-enable exit on error
 

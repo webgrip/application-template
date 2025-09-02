@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 # Install dependencies needed by ACT
-RUN apk add --no-cache docker git bash curl
+RUN apk add --no-cache docker git bash curl jq
 
 # Download and install ACT binary
 RUN curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | bash -s -- -b /usr/local/bin
@@ -9,5 +9,5 @@ RUN curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | bas
 # Set working directory
 WORKDIR /workspace
 
-# Default command
-ENTRYPOINT ["act"]
+# Default command (can be overridden)
+CMD ["act"]

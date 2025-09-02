@@ -13,7 +13,7 @@ SHELL := /usr/bin/bash
 
 # Tools (override if needed, e.g., COMPOSE="docker-compose")
 COMPOSE ?= docker compose
-ACT_IMAGE ?= webgrip/act-runner:latest
+ACT_IMAGE ?= application-template-act:latest
 # Platform mapping for act (-P). Map the custom runs-on label to a real act environment image.
 # Default maps 'arc-runner-set' to the nektos act Ubuntu environment (change if you prefer another image).
 ACT_RUNNER_PLATFORM ?= arc-runner-set=ghcr.io/catthehacker/ubuntu:act-latest
@@ -195,7 +195,7 @@ setup-act: build-act  ## Build ACT Docker image and setup testing environment
 ## Validate ACT configuration and setup
 validate-act:  ## Validate ACT configuration and dependencies
 	@printf "$(C_INFO)Validating ACT configuration...$(C_RESET)\n"
-	@docker run --rm -v $(PWD):/workspace -w /workspace -v /var/run/docker.sock:/var/run/docker.sock $(ACT_IMAGE) --version
+	@docker run --rm -v $(PWD):/workspace -w /workspace -v /var/run/docker.sock:/var/run/docker.sock $(ACT_IMAGE) act --version
 	@./scripts/validate-act.sh
 
 ## Test the template sync workflow with dry run
@@ -210,7 +210,7 @@ test-sync-workflow:  ## Test sync-template-files workflow with ACT (dry run)
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--env-file .act_secrets \
 		--env-file .act_env \
-	$(ACT_IMAGE) workflow_dispatch -P $(ACT_RUNNER_PLATFORM) \
+	$(ACT_IMAGE) act workflow_dispatch -P $(ACT_RUNNER_PLATFORM) \
 		--eventpath .github/act-events/workflow-dispatch-dry-run.json \
 		--workflows .github/workflows/sync-template-files.yml \
 		--artifact-server-path ./act_output
@@ -227,7 +227,7 @@ test-sync-push:  ## Test sync workflow triggered by push event
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--env-file .act_secrets \
 		--env-file .act_env \
-	    $(ACT_IMAGE) push -P $(ACT_RUNNER_PLATFORM) \
+	    $(ACT_IMAGE) act push -P $(ACT_RUNNER_PLATFORM) \
 		--eventpath .github/act-events/push-template-files.json \
 		--workflows .github/workflows/sync-template-files.yml \
 		--artifact-server-path ./act_output
@@ -238,7 +238,7 @@ test-workflows:  ## Test all GitHub Actions workflows locally
 	@$(call _req_file,.act_secrets)
 	@printf "$(C_INFO)Testing all workflows...$(C_RESET)\n"
 	@mkdir -p act_output
-	docker run --rm -v $(PWD):/workspace -w /workspace $(ACT_IMAGE) --list
+	docker run --rm -v $(PWD):/workspace -w /workspace $(ACT_IMAGE) act --list
 	@printf "$(C_INFO)Running workflow tests...$(C_RESET)\n"
 	docker run --rm \
 		-v $(PWD):/workspace \
@@ -246,7 +246,7 @@ test-workflows:  ## Test all GitHub Actions workflows locally
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--env-file .act_secrets \
 		--env-file .act_env \
-	$(ACT_IMAGE) push -P $(ACT_RUNNER_PLATFORM) \
+	$(ACT_IMAGE) act push -P $(ACT_RUNNER_PLATFORM) \
 		--eventpath .github/act-events/push-template-files.json \
 		--artifact-server-path ./act_output || true
 	@printf "$(C_OK)Workflow tests completed$(C_RESET)\n"
@@ -255,7 +255,7 @@ test-workflows:  ## Test all GitHub Actions workflows locally
 list-workflows:  ## List all available workflows for ACT testing
 	@$(call _req_cmd,docker)
 	@printf "$(C_INFO)Available workflows:$(C_RESET)\n"
-	@docker run --rm -v $(PWD):/workspace -w /workspace -v /var/run/docker.sock:/var/run/docker.sock $(ACT_IMAGE) --list || printf "$(C_WARN)Some workflows have syntax issues but ACT is working$(C_RESET)\n"
+	@docker run --rm -v $(PWD):/workspace -w /workspace -v /var/run/docker.sock:/var/run/docker.sock $(ACT_IMAGE) act --list || printf "$(C_WARN)Some workflows have syntax issues but ACT is working$(C_RESET)\n"
 
 ## Clean ACT artifacts and temporary files
 clean-act:  ## Clean ACT output and temporary files

@@ -27,10 +27,6 @@ on:
 jobs:
   sync-files:
     name: 'Sync Template Files'
-    uses: webgrip/workflows/.github/workflows/sync-template-files.yml@main
-
-  sync-files:
-    name: 'Sync Template Files'
     runs-on: arc-runner-set
 
     steps:
