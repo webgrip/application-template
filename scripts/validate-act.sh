@@ -39,6 +39,35 @@ if [ ! -f .act_secrets ]; then
     echo "   Create .act_secrets with real tokens for actual testing."
 fi
 
+# If .act_secrets exists, check for common required values and warn for placeholders
+if [ -f .act_secrets ]; then
+    GITHUB_TOKEN_VAL=$(grep -E '^GITHUB_TOKEN=' .act_secrets || true)
+    if [ -z "$GITHUB_TOKEN_VAL" ]; then
+        echo "⚠️  .act_secrets does not contain GITHUB_TOKEN. Some workflows require this."
+    else
+        # Extract value and check for obvious placeholder
+        GITHUB_TOKEN_VALUE=$(echo "$GITHUB_TOKEN_VAL" | sed -E 's/^GITHUB_TOKEN=(.*)$/\1/')
+        if [ "$GITHUB_TOKEN_VALUE" = "your_github_token_here" ] || [ -z "$GITHUB_TOKEN_VALUE" ]; then
+            echo "⚠️  GITHUB_TOKEN in .act_secrets appears to be the example placeholder. Replace it with a real token."
+        else
+            echo "✅ GITHUB_TOKEN appears set in .act_secrets"
+        fi
+    fi
+
+    # Check for runtime token/url used by some actions (upload-artifact/etc.)
+    if ! grep -q '^ACTIONS_RUNTIME_TOKEN=' .act_secrets 2>/dev/null; then
+        echo "⚠️  ACTIONS_RUNTIME_TOKEN not found in .act_secrets. Add it to avoid upload-artifact errors when running ACT locally."
+    else
+        echo "✅ ACTIONS_RUNTIME_TOKEN found in .act_secrets"
+    fi
+
+    if ! grep -q '^ACTIONS_RUNTIME_URL=' .act_secrets 2>/dev/null; then
+        echo "⚠️  ACTIONS_RUNTIME_URL not found in .act_secrets. Add it to avoid upload-artifact errors when running ACT locally."
+    else
+        echo "✅ ACTIONS_RUNTIME_URL found in .act_secrets"
+    fi
+fi
+
 # Check if environment file exists
 if [ ! -f .act_env ]; then
     echo "❌ .act_env environment file missing"

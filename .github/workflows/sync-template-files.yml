@@ -27,20 +27,31 @@ on:
 jobs:
   sync-files:
     name: 'Sync Template Files'
-    runs-on: ubuntu-latest
-    
+    uses: webgrip/workflows/.github/workflows/sync-template-files.yml@main
+
+  sync-files:
+    name: 'Sync Template Files'
+    runs-on: arc-runner-set
+
     steps:
       - name: Checkout template repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
+
+      - name: Install GitHub CLI
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          apt update
+          apt install -y gh
+
       - name: Find repositories with topic
         id: find-repos
         env:
@@ -48,28 +59,11 @@ jobs:
           TOPIC: ${{ github.event.inputs.topic || 'application' }}
         run: |
           echo "Finding repositories with topic: $TOPIC"
-          
+
           # Get repositories with the specified topic in the same organization
-          REPOS=$(gh api graphql -f query='
-            query($org: String!, $topic: String!) {
-              organization(login: $org) {
-                repositories(first: 100) {
-                  nodes {
-                    name
-                    repositoryTopics(first: 10) {
-                      nodes {
-                        topic {
-                          name
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          ' -f org="${{ github.repository_owner }}" -f topic="$TOPIC" \
-          --jq '.data.organization.repositories.nodes[] | select(.repositoryTopics.nodes[].topic.name == "'"$TOPIC"'") | .name')
-          
+          # Load the GraphQL query from a file to avoid complex quoting that breaks under act
+          REPOS=$(gh api graphql -f query="$(cat .github/workflows/find_repos_query.graphql)" -f org="${{ github.repository_owner }}" --jq '.data.organization.repositories.nodes[] | select(.repositoryTopics.nodes[].topic.name == "'"$TOPIC"'" ) | .name')
+
           if [ -z "$REPOS" ]; then
             echo "No repositories found with topic: $TOPIC"
             echo "repos=[]" >> $GITHUB_OUTPUT
@@ -80,7 +74,7 @@ jobs:
             REPOS_JSON=$(echo "$REPOS" | jq -R -s -c 'split("\n")[:-1]')
             echo "repos=$REPOS_JSON" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Sync to repositories
         if: steps.find-repos.outputs.repos != '[]'
         env:
@@ -89,7 +83,7 @@ jobs:
         run: |
           REPOS='${{ steps.find-repos.outputs.repos }}'
           echo "Syncing to repositories: $REPOS"
-          
+
           # Define files to sync with their destination paths
           declare -A FILES_TO_SYNC=(
             [".editorconfig"]=".editorconfig"
@@ -100,37 +94,37 @@ jobs:
             [".github/workflows/on_source_change.yml"]=".github/workflows/on_source_change.yml"
             [".github/workflows/on_workflow_files_change.yml"]=".github/workflows/on_workflow_files_change.yml"
           )
-          
+
           # Create sync script
           cat > sync_script.sh << 'EOF'
           #!/bin/bash
           set -e
-          
+
           REPO_NAME=$1
           DRY_RUN=$2
           TEMPLATE_REPO="${{ github.repository }}"
           ORG="${{ github.repository_owner }}"
-          
+
           echo "Processing repository: $REPO_NAME"
-          
+
           if [ "$DRY_RUN" = "true" ]; then
             echo "DRY RUN: Would sync files to $ORG/$REPO_NAME"
             return 0
           fi
-          
+
           # Clone the target repository
           TEMP_DIR=$(mktemp -d)
           cd "$TEMP_DIR"
-          
+
           echo "Cloning $ORG/$REPO_NAME..."
           gh repo clone "$ORG/$REPO_NAME" .
-          
+
           # Check if there's already a sync branch
           BRANCH_NAME="feat/sync-template-files-$(date +%Y%m%d-%H%M%S)"
           git checkout -b "$BRANCH_NAME"
-          
+
           CHANGES_MADE=false
-          
+
           # Copy files from template
           declare -A FILES_TO_SYNC=(
             [".editorconfig"]=".editorconfig"
@@ -141,19 +135,19 @@ jobs:
             [".github/workflows/on_source_change.yml"]=".github/workflows/on_source_change.yml"
             [".github/workflows/on_workflow_files_change.yml"]=".github/workflows/on_workflow_files_change.yml"
           )
-          
+
           for SOURCE_FILE in "${!FILES_TO_SYNC[@]}"; do
             DEST_FILE="${FILES_TO_SYNC[$SOURCE_FILE]}"
-            
+
             if [ -f "$GITHUB_WORKSPACE/$SOURCE_FILE" ]; then
               echo "Syncing $SOURCE_FILE -> $DEST_FILE"
-              
+
               # Create destination directory if it doesn't exist
               DEST_DIR=$(dirname "$DEST_FILE")
               if [ "$DEST_DIR" != "." ]; then
                 mkdir -p "$DEST_DIR"
               fi
-              
+
               # Check if file exists and compare content
               if [ -f "$DEST_FILE" ]; then
                 if ! cmp -s "$GITHUB_WORKSPACE/$SOURCE_FILE" "$DEST_FILE"; then
@@ -172,29 +166,17 @@ jobs:
               echo "Warning: Source file $SOURCE_FILE not found in template"
             fi
           done
-          
+
           if [ "$CHANGES_MADE" = true ]; then
             echo "Changes detected, creating pull request..."
-            
+
             git add .
             git config user.name "Template Sync Bot"
             git config user.email "noreply@github.com"
-            git commit -m "feat: sync template files from $TEMPLATE_REPO
+            git commit -m "feat: sync template files from $TEMPLATE_REPO@${{ github.sha }}"
 
-Automated synchronization of template files to maintain consistency.
-
-Files synchronized:
-- Workflow files (.github/workflows/)
-- Configuration files (.editorconfig, .gitignore, .releaserc.json)  
-- VSCode settings (.vscode/settings.json)
-
-⚠️  IMPORTANT: Template changes take precedence over local modifications.
-Review this PR carefully to preserve any repository-specific customizations.
-
-Source: $TEMPLATE_REPO@${{ github.sha }}"
-            
             git push origin "$BRANCH_NAME"
-            
+
             # Create pull request
             gh pr create \
               --title "feat: sync template files from $TEMPLATE_REPO" \
@@ -220,23 +202,23 @@ Source: $TEMPLATE_REPO@${{ github.sha }}"
             ## Source
             Template Repository: \`$TEMPLATE_REPO\`
             Template Commit: \`${{ github.sha }}\`
-            
+
             ## Automated Sync
             This PR was created automatically by the template sync workflow. If you don't want to receive these updates, remove the \`application\` topic from your repository." \
               --head "$BRANCH_NAME" \
               --base "main"
-              
+
             echo "Pull request created successfully"
           else
             echo "No changes detected, skipping pull request creation"
           fi
-          
+
           cd /
           rm -rf "$TEMP_DIR"
           EOF
-          
+
           chmod +x sync_script.sh
-          
+
           # Process each repository
           echo "$REPOS" | jq -r '.[]' | while read -r repo; do
             echo "Processing repository: $repo"
@@ -245,7 +227,7 @@ Source: $TEMPLATE_REPO@${{ github.sha }}"
               continue
             }
           done
-          
+
       - name: Summary
         if: always()
         run: |

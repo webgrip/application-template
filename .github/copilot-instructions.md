@@ -32,7 +32,7 @@ These thinkers influence our approach to software development, take their philos
 - `tests/functional`: Whereas integration tests test the integration of several components, functional tests focus on the functionality of the application as a whole. (Sending requests and asserting responses)
 - `tests/contract`: Contract tests for the application (Test the functionality against the contract)
 - `tests/e2e`: Use a simulated browser environment to interact with the application (Playwright)
-- `tests/smoke`: Tests that verify the basic functionality of the application (eg. health checks, basic API endpoint checks)
+- `tests/smoke`: Tests that verify the basic functionality of the application (eg. health checks, basic API endpoint checks, **negation** is important too. When we expect something not to happen, we need to test that as well, such as a HTTP 2XX on a request that should fail like admin endpoints.)
 - `tests/manual`: Manual tests for the application. (eg. .http files, Postman collections, OpenAPI specifications)
 - `tests/performance`: Performance tests for the application (JMeter, k6)
 - `tests/behavioral`: BDD tests for the application (Cucumber, SpecFlow)
@@ -41,6 +41,3 @@ These thinkers influence our approach to software development, take their philos
 
 #### Secrets & Encryption
 - Encrypted secrets are managed with age/sops. Plaintext secrets live under `ops/secrets/*/values.dec.yaml` and are encrypted with `make encrypt-secrets` (see `README.md`).
-
-## Extra rules
-- Always check to see if the docker-compose.yml output is good before giving it back to the human. If it repeatedly fails, log the output for further analysis and notify the human.

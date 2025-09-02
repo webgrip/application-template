@@ -1,22 +1,57 @@
 # application-application
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/organisation/application-application/test.yml?style=for-the-badge)](https://github.com/organisation/application-application/actions)
-[![License](https://img.shields.io/github/license/organisation/application-application?style=for-the-badge)](LICENSE)
+## Badges
+
+[![Template Sync](https://img.shields.io/github/actions/workflow/status/webgrip/application-template/sync-template-files.yml?label=template%20sync&style=flat-square)](https://github.com/webgrip/application-template/actions/workflows/sync-template-files.yml)
+[![License](https://img.shields.io/github/license/webgrip/application-template?style=flat-square)](LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-orange.svg?style=flat-square)](https://www.conventionalcommits.org)
+[![SemVer](https://img.shields.io/badge/semver-2.0.0-blue?style=flat-square)](https://semver.org)
+[![Local CI (ACT)](https://img.shields.io/badge/Local%20CI-ACT-1f425f?style=flat-square)](https://github.com/nektos/act)
+[![Dockerized](https://img.shields.io/badge/containerized-docker-2496ED?logo=docker&logoColor=white&style=flat-square)](https://www.docker.com/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/webgrip/application-template/issues)
+
+> Opinionated application template focused on repeatable quality: tested workflows, semantic releases, and automatic template drift correction.
 
 ---
 
+## At a Glance
+
+| Aspect | What You Get |
+| ------ | ------------- |
+| CI/CD  | Reproducible local workflow testing via ACT + GitHub Actions pipelines |
+| Consistency | Automatic sync of core config & workflow files to app repos (opt‑in via topic) |
+| Quality | Conventional Commits + Semantic Versioning scaffolding |
+| Documentation | TechDocs-ready structure for internal/platform portals |
+| Security | Encrypted secrets handling via SOPS + age |
+| Developer UX | Pre-configured editor & workflow automation |
+
+## Features
+
+- Automated template file synchronization (opt‑in per repo by GitHub topic)
+- Local CI parity using Docker + ACT (fast feedback loops)
+- Semantic release readiness (`.releaserc.json` included)
+- Encrypted secrets workflow (age / SOPS)
+- Curated GitHub workflow set (docs changes, source changes)
+- Opinionated baseline configs: EditorConfig, VSCode settings, .gitignore
+- Structured test categories (unit, integration, functional, contract, e2e, smoke, performance, behavioral)
+
 ## Description
 
-...
+Foundation repository for bootstrapping internal / external application services with consistent engineering guardrails. Replace the placeholder service specifics with your domain logic while retaining the shared operational workflows.
 
 ## Template Synchronization
 
 This repository serves as a template that can automatically sync certain files to application repositories. To enable template sync for your application repository, add the `application` topic to your repository.
 
 **Synced Files Include:**
-- GitHub workflow files (`.github/workflows/`)
-- Configuration files (`.editorconfig`, `.gitignore`, `.releaserc.json`)
-- Development tools configuration (`.vscode/settings.json`)
+
+| Category | Files |
+| -------- | ----- |
+| Workflows | `.github/workflows/*.yml` (selected core automation) |
+| Config | `.editorconfig`, `.gitignore`, `.releaserc.json` |
+| Dev UX | `.vscode/settings.json` |
+
+These represent the "source of truth"; local divergent changes in target repos will be overwritten (review PRs carefully).
 
 For detailed information, see the [Template Sync Documentation](docs/techdocs/template-sync.md).
 
@@ -42,6 +77,14 @@ make test-workflows
 
 For detailed testing documentation, see [Workflow Testing with ACT](docs/techdocs/docs/act-testing.md).
 
+### Troubleshooting
+
+| Symptom | Suggestion |
+| ------- | ---------- |
+| Workflow fails locally but passes on GitHub | Ensure ACT image parity & check for missing secrets in `.act_secrets` |
+| Template sync finds zero repos | Confirm the target repos have the `application` topic & token scope includes `read:org` |
+| Secrets encryption errors | Run `make init-encrypt` first; verify `SOPS_AGE_KEY` in CI |
+
 ## Getting Started
 
 ### Encrypted secrets
@@ -52,12 +95,12 @@ make init-encrypt
 
 Creates:
 
-* `age.agekey` → add to repo secret `SOPS_AGE_KEY`
-* `age.pubkey` → used for encryption
+- `age.agekey` → add to repo secret `SOPS_AGE_KEY`
+- `age.pubkey` → used for encryption
 
 Add plaintext secrets to:
 
-```
+```bash
 ops/secrets/application-application-secrets/values.dec.yaml
 ```
 
@@ -79,3 +122,23 @@ docker compose down --remove-orphans --volumes
 ```
 
 ---
+
+## Contributing
+
+Contributions welcome! Please:
+
+1. Open an issue describing the change
+2. Use Conventional Commits for branch + commit messages
+3. Add / adjust tests where behavior changes
+4. Update docs (README / TechDocs / ADRs) when altering architecture
+
+## Roadmap (Excerpt)
+
+- [ ] Add coverage reporting & badge
+- [ ] Introduce example service code scaffolding
+- [ ] Provide k6 performance test harness
+- [ ] Optional Terraform module integration
+
+## License
+
+Distributed under the terms of the MIT license. See `LICENSE` for details.
