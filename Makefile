@@ -20,8 +20,8 @@ ACT_RUNNER_PLATFORM ?= arc-runner-set=ghcr.io/catthehacker/ubuntu:act-latest
 
 # Services / paths ----------------------------------------------------------------
 # APP_NAME / NAMESPACE let you quickly adapt this Makefile across similar Laravel apps.
-# For an invoiceninja style deployment set, for example:
-#   make expose NAMESPACE=invoiceninja-application SERVICE_NAME=invoiceninja-application REMOTE_PORT=80
+# For example:
+#   make expose NAMESPACE=application-application SERVICE_NAME=application-application REMOTE_PORT=80
 APP_NAME      ?= application-application
 NAMESPACE     ?= $(APP_NAME)
 SERVICE_NAME  ?= $(APP_NAME)
