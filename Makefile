@@ -14,9 +14,25 @@ NAMESPACE     ?= $(APP_NAME)
 SERVICE_NAME  ?= $(APP_NAME)
 APP_SERVICE   ?= $(APP_NAME).application
 ENV_FILE      ?= .env
+COMPOSE       ?= docker compose
 HELMFILE      ?= helmfile
 HELMFILE_FILE ?= helmfile.yaml
 HELMFILE_ENV  ?=
+
+# Secrets management
+AGE_KEY       ?= .age.key
+AGE_PUB       ?= .age.pub
+DECRYPT_FILE  ?= values.dec.yaml
+SOPS_FILE     ?= values.yaml
+
+# Helm configuration
+HELM_CHART_DIR ?= ops/helm/$(APP_NAME)
+RELEASE       ?= $(APP_NAME)
+HELM_VALUES   ?=
+
+# Kubernetes port forwarding
+LOCAL_PORT    ?= 8080
+REMOTE_PORT   ?= 80
 
 # Colors for nicer output
 C_RESET := \033[0m
@@ -104,6 +120,13 @@ AWK_ARGS = -v VERSION="$(VERSION)" -v INCATS="$(HELP_CATEGORIES)" -v SHOW_GROUPS
 define _req_cmd
 	@if ! command -v $(1) >/dev/null 2>&1; then \
 		printf "$(C_ERR)Missing dependency: $(1)$(C_RESET)\n"; \
+		exit 1; \
+	fi
+endef
+
+define _req_file
+	@if [ ! -f $(1) ]; then \
+		printf "$(C_ERR)Missing file: $(1)$(C_RESET)\n"; \
 		exit 1; \
 	fi
 endef
@@ -374,22 +397,21 @@ wait-ready:  ## Poll a URL until HTTP 200 (URL=...)
 	for i in $$(seq 1 60); do \
 		code=$$(curl -sk -o /dev/null -w '%{http_code}' "$$URL"); \
 		if [ "$$code" = "200" ]; then printf "$(C_OK)Ready!$(C_RESET)\n"; exit 0; fi; \
-	  echo "Replaced existing APP_KEY (backup $(ENV_FILE).bak)"; \
-	else \
-	  printf '\nAPP_KEY=%s\n' "$$NEW_KEY" >> $(ENV_FILE); \
-	  echo "Appended APP_KEY to end of $(ENV_FILE)"; \
-	fi;
+		sleep 1; \
+	done; \
+	printf "$(C_ERR)Timeout waiting for %s$(C_RESET)\n" "$$URL"; exit 1
 
 # --- App bootstrap -----------------------------------------------------------
 
-## Create an admin user (EMAIL, PASS envs optional; command uses ninja:create-account)
+## Create an admin user (EMAIL, PASS envs optional; customize command for your app)
 user\:create: ## Create user (override EMAIL=user@example.com PASS=pass)
 	@$(call _req_cmd,$(word 1,$(COMPOSE)))
 	: $${EMAIL:=admin@example.com}; \
 	: $${PASS:=password}; \
 	printf "$(C_INFO)Creating user %s...$(C_RESET)\n" "$$EMAIL"; \
-	$(COMPOSE) exec $(APP_SERVICE) php artisan ninja:create-account --email="$$EMAIL" --password="$$PASS"; \
-	printf "$(C_OK)Created user %s$(C_RESET)\n" "$$EMAIL"
+	echo "TODO: Customize this command for your application framework"; \
+	# $(COMPOSE) exec $(APP_SERVICE) your-user-creation-command --email="$$EMAIL" --password="$$PASS"; \
+	printf "$(C_OK)User creation template - implement for your app$(C_RESET)\n"
 
 # --- Phony list ---------------------------------------------------------------
 

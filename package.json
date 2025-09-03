@@ -1,7 +1,7 @@
 {
   "name": "application-template",
   "version": "1.0.0",
-  "description": "A comprehensive application template with automated template file synchronization, GitHub Actions testing with ACT, and development tooling infrastructure",
+  "description": "A comprehensive application template with automated template file synchronization, modern development workflows, and comprehensive tooling infrastructure",
   "main": "src/index.js",
   "type": "module",
   "directories": {
@@ -13,19 +13,17 @@
     "test:unit": "echo \"Unit tests not implemented\" && exit 0",
     "test:integration": "echo \"Integration tests not implemented\" && exit 0",
     "test:e2e": "echo \"E2E tests not implemented\" && exit 0",
-    "test:workflows": "make test-workflows",
-    "test:sync": "make test-sync-workflow",
     "docker:up": "make start",
     "docker:down": "make stop",
     "docker:logs": "make logs",
     "helm:init": "make init-helm",
-    "secrets:encrypt": "make encrypt-secrets",
-    "secrets:decrypt": "make decrypt-secrets",
+    "secrets:encrypt": "make secrets:encrypt",
+    "secrets:decrypt": "make secrets:decrypt",
     "dev": "echo \"Development server not configured\" && exit 1",
     "build": "echo \"Build process not configured\" && exit 1",
     "lint": "echo \"Linting not configured\" && exit 1",
     "format": "echo \"Formatting not configured\" && exit 1",
-  "clean": "rm -rf node_modules/.cache"
+    "clean": "rm -rf node_modules/.cache"
   },
   "repository": {
     "type": "git",

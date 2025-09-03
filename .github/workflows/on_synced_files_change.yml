@@ -50,13 +50,13 @@ jobs:
             .github/workflows/copilot-setup-steps.yml
           patterns_to_include: >
             .github/workflows,
-            .vscode
+            .vscode,
             .dockerignore,
             .editorconfig,
             .env.example,
             .gitignore,
             .releaserc,
-            AGENTS.md,
+            AGENTS.md
           topics_to_include: "${{ github.event.inputs.topic || 'application' }}"
           exclude_private: false
           exclude_forked: false

@@ -27,7 +27,6 @@
 ## Features
 
 - Automated template file synchronization (opt‑in per repo by GitHub topic)
-// Removed ACT local CI support
 - Semantic release readiness (`.releaserc.json` included)
 - Encrypted secrets workflow (age / SOPS)
 - Curated GitHub workflow set (docs changes, source changes)
