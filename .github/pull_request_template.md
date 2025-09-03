@@ -27,11 +27,6 @@ _What does this PR do?_
 
 ---
 
-## 🔍 Related Issues
-Closes #___
-
----
-
 ## ✅ Checklist
 - [ ] Added documentation
 - [ ] Tests added / updated

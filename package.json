@@ -1,0 +1,59 @@
+{
+  "name": "application-template",
+  "version": "1.0.0",
+  "description": "A comprehensive application template with automated template file synchronization, modern development workflows, and comprehensive tooling infrastructure",
+  "main": "src/index.js",
+  "type": "module",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"No tests specified yet\" && exit 0",
+    "test:unit": "echo \"Unit tests not implemented\" && exit 0",
+    "test:integration": "echo \"Integration tests not implemented\" && exit 0",
+    "test:e2e": "echo \"E2E tests not implemented\" && exit 0",
+    "docker:up": "make start",
+    "docker:down": "make stop",
+    "docker:logs": "make logs",
+    "helm:init": "make init-helm",
+    "secrets:encrypt": "make secrets:encrypt",
+    "secrets:decrypt": "make secrets:decrypt",
+    "dev": "echo \"Development server not configured\" && exit 1",
+    "build": "echo \"Build process not configured\" && exit 1",
+    "lint": "echo \"Linting not configured\" && exit 1",
+    "format": "echo \"Formatting not configured\" && exit 1",
+    "clean": "rm -rf node_modules/.cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webgrip/application-template.git"
+  },
+  "keywords": [
+    "template",
+    "application",
+    "github-actions",
+    "automation",
+    "devops",
+    "docker",
+    "helm",
+    "sops",
+    "age"
+  ],
+  "author": "WebGrip",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webgrip/application-template/issues"
+  },
+  "homepage": "https://github.com/webgrip/application-template#readme",
+  "engines": {
+    "node": ">=20.10.0",
+    "npm": ">=10.2.5"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "volta": {
+    "node": "20.10.0",
+    "npm": "10.2.5"
+  }
+}

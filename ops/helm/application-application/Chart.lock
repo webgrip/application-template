@@ -5,5 +5,11 @@ dependencies:
 - name: app-template
   repository: https://bjw-s-labs.github.io/helm-charts
   version: 4.2.0
-digest: sha256:a6caa64bd6018fa4e74214585d43eb65f83f5b16d8d6b870656c1b78cbd1ecbc
-generated: "2025-08-19T00:24:57.151992157+02:00"
+- name: mariadb
+  repository: https://charts.bitnami.com/bitnami
+  version: 21.0.8
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 22.0.7
+digest: sha256:5762a14fc0913bbe7a0ce38de80c411384ef8d865298d64cea4eb9ff788136dc
+generated: "2025-09-02T12:07:11.978575313+02:00"
