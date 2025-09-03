@@ -44,7 +44,7 @@ jobs:
       - name: Sync files
         uses: derberg/manage-files-in-multiple-repositories@v2
         with:
-          branches: "^development$"
+          branches: "^main$"
           github_token: ${{ steps.app-token.outputs.token }}
           patterns_to_ignore: >
             .github/workflows/on_synced_files_change.yml,
