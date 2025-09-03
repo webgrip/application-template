@@ -6,11 +6,13 @@ on:
       - 'main'
     paths:
       - '.github/workflows/**'
+      - '.dockerignore'
       - '.editorconfig'
       - '.gitignore'
-      - '.releaserc.json'
-      - '.vscode/**'
-      - 'docs/techdocs/**'
+      - 'AGENTS.md'
+      - '.releaserc'
+      - '.env.example'
+      - '.vscode'
   workflow_dispatch:
     inputs:
       topic:
@@ -44,16 +46,17 @@ jobs:
           branches: "^development$"
           github_token: ${{ steps.app-token.outputs.token }}
           patterns_to_ignore: >
-            .github/workflows/sync-template-files.yml,
+            .github/workflows/on_synced_files_change.yml,
             .github/workflows/copilot-setup-steps.yml
           patterns_to_include: >
             .github/workflows,
+            .vscode
             .dockerignore,
             .editorconfig,
-            AGENTS.md,
-            .releaserc,
             .env.example,
-            .vscode
+            .gitignore,
+            .releaserc,
+            AGENTS.md,
           topics_to_include: "${{ github.event.inputs.topic || 'application' }}"
           exclude_private: false
           exclude_forked: false
