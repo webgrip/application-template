@@ -17,6 +17,11 @@ jobs:
   release:
     name: 'Release'
     uses: webgrip/workflows/.github/workflows/semantic-release.yml@main
+    with:
+      use-bot-to-commit: true
+    secrets:
+      WEBGRIP_CI_APP_ID: ${{ secrets.WEBGRIP_CI_APP_ID }}
+      WEBGRIP_CI_APP_PRIVATE_KEY: ${{ secrets.WEBGRIP_CI_APP_PRIVATE_KEY }}
 
   determine-changed-secrets:
     name: "Secrets"
@@ -70,4 +75,5 @@ jobs:
     with:
       environment: 'staging'
       path: './ops/helm/${{ github.event.repository.name }}'
+      image_repository: ${{ github.repository }}
       tag: ${{ needs.release.outputs.version }}
