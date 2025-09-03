@@ -6,13 +6,14 @@ on:
       - 'main'
     paths:
       - '.github/workflows/**'
+      - '.vscode/**'
       - '.dockerignore'
       - '.editorconfig'
-      - '.gitignore'
-      - 'AGENTS.md'
-      - '.releaserc'
       - '.env.example'
-      - '.vscode'
+      - '.gitignore'
+      - '.releaserc'
+      - 'AGENTS.md'
+      - 'Makefile'
   workflow_dispatch:
     inputs:
       topic:
@@ -56,7 +57,8 @@ jobs:
             .env.example,
             .gitignore,
             .releaserc,
-            AGENTS.md
+            AGENTS.md,
+            Makefile
           topics_to_include: "${{ github.event.inputs.topic || 'application' }}"
           exclude_private: false
           exclude_forked: false
