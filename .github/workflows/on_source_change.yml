@@ -1,7 +1,7 @@
 name: '[Workflow] On Source Change'
 
 concurrency:
-  group: push-${{ github.branch }}
+  group: push-${{ github.ref_name }}
 
 on:
   push:
