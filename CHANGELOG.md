@@ -1,3 +1,29 @@
+# [1.6.0](https://github.com/webgrip/application-template/compare/1.5.1...1.6.0) (2025-09-03)
+
+
+### Bug Fixes
+
+* always build docs on change, just don't always deploy to pages. But I still want the artifact ([472daf8](https://github.com/webgrip/application-template/commit/472daf82a9ed0ce6b8cb855439965c29e7be14b7))
+* Don't checkout the repo first, might cause trouble ([d5b6671](https://github.com/webgrip/application-template/commit/d5b6671b29242bde0968a8e6108461da4b6c389d))
+* final changes ([ccab638](https://github.com/webgrip/application-template/commit/ccab63818df0a85a412015751304cc55c023a46a))
+* pulled out ACT and put it where it belongs ([ffba443](https://github.com/webgrip/application-template/commit/ffba443a3c2a9dd62cb86299b4bd88150b6e8820))
+* renamed workflow file to follow conventions and final checks for act removal ([00f124f](https://github.com/webgrip/application-template/commit/00f124fab5dd67fa833a8a2fc1526853623b1db3))
+* resolve Docker image naming, workflow syntax, and Node.js version consistency issues ([05b4122](https://github.com/webgrip/application-template/commit/05b41229fb37d8d78235941e7cf67a18740aa57a))
+* sync on main ([894da15](https://github.com/webgrip/application-template/commit/894da15a3530dd4b72e7b7f54aa99c1f00dcb5d6))
+* test ([8314382](https://github.com/webgrip/application-template/commit/8314382bae25a2540cb059efc88cfc9ae4c26b3e))
+* use > to make it clearer what we're syncing ([b087a77](https://github.com/webgrip/application-template/commit/b087a77afa5bca718cb6a22fe7bac13331a546a7))
+* use ref_name ([ebb1e78](https://github.com/webgrip/application-template/commit/ebb1e784590da31057e8a35cdb145a4f82222ad9))
+
+
+### Features
+
+* comprehensive application template with automated sync, architectural documentation, and production-ready infrastructure ([0d38f21](https://github.com/webgrip/application-template/commit/0d38f21f48cccfff0d457de66b792d3c48f40a40))
+* implement comprehensive ACT testing infrastructure for GitHub workflows ([8501f61](https://github.com/webgrip/application-template/commit/8501f6129d23f7e4743fc6275ea958304bf9f3a9))
+* implement Docker-based ACT with locally built image for GitHub Actions testing ([f69acd0](https://github.com/webgrip/application-template/commit/f69acd00f9d6845eb4ee650deaba492e0b89edce))
+* implement template file synchronization workflow ([a92691d](https://github.com/webgrip/application-template/commit/a92691df8612de747a84776875301afb5e26b9ba))
+* initialize npm project with integrated scripts and Node.js tooling ([5ab7808](https://github.com/webgrip/application-template/commit/5ab7808d223aead53089a87d1ca93bf3080cb9fa))
+* update template sync to use 'application' topic and semantic commits ([069980e](https://github.com/webgrip/application-template/commit/069980e1dd2677607c1a33c5754be8b705d754d8))
+
 ## [1.5.1](https://github.com/webgrip/application-template/compare/1.5.0...1.5.1) (2025-08-29)
 
 
