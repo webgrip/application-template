@@ -1,12 +1,8 @@
-namespace: invoiceninja-application
+namespace: application-application
 
 _shared_config:
-  hostname: &hostname invoiceninja-application.staging.k8s.webgrip.nl
-  url: &url https://invoiceninja-application.staging.k8s.webgrip.nl
-  image: &image
-    repository: docker.io/webgrip/invoiceninja-application
-    tag: "latest"
-    pullPolicy: Always
+  hostname: &hostname application-application.staging.k8s.webgrip.nl
+  url: &url https://application-application.staging.k8s.webgrip.nl
 
 application:
   enabled: true
@@ -19,7 +15,10 @@ application:
           fsGroupChangePolicy: OnRootMismatch
       containers:
         app:
-          image: *image
+          image:
+            repository: docker.io/webgrip/application-application
+            tag: "latest"
+            pullPolicy: Always
           resources:
             requests: { cpu: "250m", memory: "256Mi" }
             limits: { cpu: "500m", memory: "512Mi" }
@@ -33,7 +32,7 @@ application:
                     [
                       "sh",
                       "-c",
-                      "php -v >/dev/null && nc -z invoiceninja-application-mariadb 3306",
+                      "php -v >/dev/null && nc -z application-application-mariadb 3306",
                     ]
                 initialDelaySeconds: 10
                 periodSeconds: 10
@@ -47,7 +46,7 @@ application:
             - name: APP_KEY
               valueFrom:
                 secretKeyRef:
-                  name: invoiceninja-application-secrets
+                  name: application-application-secrets
                   key: app-key
             - name: APP_LOCALE
               value: en
@@ -56,7 +55,7 @@ application:
             - name: APP_TIMEZONE
               value: Europe/Amsterdam
             - name: APP_NAME
-              value: "invoiceninja-application"
+              value: "application-application"
             - name: DB_TYPE
               value: mysql
             - name: DB_CONNECTION
@@ -64,25 +63,25 @@ application:
             - name: DB_STRICT
               value: "false"
             - name: DB_HOST
-              value: invoiceninja-application-mariadb
+              value: application-application-mariadb
             - name: DB_PORT
               value: "3306"
             - name: DB_DATABASE
-              value: invoiceninja-application
+              value: application-application
             - name: DB_USERNAME
-              value: invoiceninja-application
+              value: application-application
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: invoiceninja-application-secrets
+                  name: application-application-secrets
                   key: mariadb-password
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: invoiceninja-application-secrets
+                  name: application-application-secrets
                   key: api-secret
             - name: REDIS_HOST
-              value: invoiceninja-application-redis-master
+              value: application-application-redis-master
             - name: REDIS_PASSWORD
               value: ""
             - name: REDIS_PORT
@@ -90,12 +89,16 @@ application:
             - name: REDIS_CLIENT
               value: phpredis
             - name: REDIS_PREFIX
-              value: invoiceninja-application_
+              value: application-application_
+            - name: TRUSTED_PROXIES
+              value: "**"
+            - name: FORCE_HTTPS
+              value: "true"
 
         web:
           image:
             repository: nginx
-            tag: 1.27-alpine
+            tag: 1.29.1-alpine
             pullPolicy: IfNotPresent
           ports:
             - name: http
@@ -143,7 +146,7 @@ application:
       tls:
         - hosts:
             - *hostname
-          secretName: letsencrypt-invoiceninja-application
+          secretName: letsencrypt-application-application
 
   persistence:
     public:
@@ -165,7 +168,7 @@ application:
     nginx-conf:
       type: configMap
       enabled: true
-      name: invoiceninja-application
+      name: application-application
       globalMounts:
         - path: /etc/nginx/conf.d
           readOnly: true
@@ -175,23 +178,32 @@ application:
       enabled: true
       data:
         default.conf: |
+          map $http_x_forwarded_proto $fastcgi_https {
+            default '';
+            https on;
+          }
           server {
             listen 80;
             root /var/www/app/public;
             index index.php index.html;
             location /health { return 200 'ok'; add_header Content-Type text/plain; }
-            location / { try_files $uri /index.php?$query_string; }
+            location / {
+              try_files $uri /index.php?$query_string;
+            }
             location ~ \.php$ {
               include fastcgi_params;
               fastcgi_pass 127.0.0.1:9000;
-              fastcgi_param SCRIPT_FILENAME /var/www/app/public$fastcgi_script_name;
-              fastcgi_index index.php;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              fastcgi_param HTTP_X_FORWARDED_PROTO $http_x_forwarded_proto;
+              fastcgi_param HTTP_X_FORWARDED_HOST  $http_x_forwarded_host;
+              fastcgi_param HTTP_X_FORWARDED_FOR   $http_x_forwarded_for;
+              fastcgi_param HTTPS                  $fastcgi_https;
             }
           }
 
 redis:
   image:
-    repository: docker.io/bitnamilegacy/redis
+    repository: bitnamilegacy/redis
     tag: "8.2.1"
     pullPolicy: IfNotPresent
   architecture: replication
@@ -206,19 +218,16 @@ redis:
 
 mariadb:
   image:
-    repository: docker.io/bitnamilegacy/mariadb
+    repository: bitnamilegacy/mariadb
     tag: "12.0.2"
     pullPolicy: IfNotPresent
   enabled: true
   auth:
-    # rootPassword: ""
-    database: invoiceninja-application
-    username: invoiceninja-application
-    # password: ""
-    existingSecret: invoiceninja-application-secrets
-    secretKeys:
-      adminPasswordKey: mariadb-root-password
-      userPasswordKey: mariadb-password
+    # rootPassword: "" # ignored when existingSecret is set
+    database: application-application
+    username: application-application
+    # password: "" # ignored when existingSecret is set
+    existingSecret: application-application-secrets
   primary:
     persistence:
       enabled: true
