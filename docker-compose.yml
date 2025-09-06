@@ -1,101 +1,86 @@
 services:
   application-application.application:
     container_name: application-application.application
-    image: organisation/application-application.application:latest
+    image: webgrip/application-application:latest
     pull_policy: never
     build:
       context: .
       dockerfile: ops/docker/application/Dockerfile
     restart: always
     depends_on:
-      application-application.postgres:
+      application-application.mariadb:
         condition: service_healthy
       application-application.redis:
         condition: service_healthy
     ports:
-      - "127.0.0.1:8080:8080"
-    env_file:
-      - .env
+      - "127.0.0.1:9000:9000"
+    env_file: ./.env
     environment:
-      - SUBDOMAIN=${SUBDOMAIN:-application-application}
-      - DOMAIN_NAME=${DOMAIN_NAME:-organisation.test}
-      - TZ=${TZ:-UTC}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
+      DB_TYPE: ${DB_CONNECTION:-}
+      DB_STRICT: "false"
+      LOG_CHANNEL: stack
+      REQUIRE_HTTPS: "false"
     volumes:
-      - application-application-application-data:/data
+      - ./.env:/var/www/app/.env
+      - application-application-application-public-data:/var/www/app/public
+      - application-application-application-storage-data:/var/www/app/storage
 
-  application-application.postgres:
-    container_name: application-application.postgres
-    image: organisation/application-application.postgres:latest
+  application-application.nginx:
+    container_name: application-application-nginx
+    image: webgrip/application-application-nginx:latest
     pull_policy: never
     build:
       context: .
-      dockerfile: ops/docker/postgres/Dockerfile
+      dockerfile: ops/docker/nginx/Dockerfile
+    restart: always
+    depends_on:
+      - application-application.application
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - application-application-application-public-data:/var/www/app/public:ro
+
+  application-application.mariadb:
+    container_name: application-application-mariadb
+    image: webgrip/application-application-mariadb:latest
+    build:
+      context: .
+      dockerfile: ops/docker/mariadb/Dockerfile
+    pull_policy: never
     restart: unless-stopped
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:3306:3306"
     logging:
       options:
         max-size: 10m
+    env_file:
+      - ./.env
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-}
-      POSTGRES_USER: ${DB_USERNAME:-}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-}
+      MARIADB_DATABASE: ${DB_DATABASE:-application}
+      MARIADB_USER: ${DB_USERNAME:-application}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-application}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MARIADB_CHARACTER_SET_SERVER: utf8mb4
+      MARIADB_COLLATION_SERVER: utf8mb4_unicode_ci
     volumes:
-      - application-application-postgres-data:/var/lib/postgresql/data
+      - application-application-mariadb-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-
-  # application-application.mariadb:
-  #   container_name: application-application.mariadb
-  #   image: organisation/application-application.mariadb:latest
-  #   build:
-  #     context: .
-  #     dockerfile: ops/docker/mariadb/Dockerfile
-  #   pull_policy: never
-  #   restart: unless-stopped
-  #   ports:
-  #     - "127.0.0.1:3306:3306"
-  #   logging:
-  #     options:
-  #       max-size: 10m
-  #   env_file:
-  #     - ./.env
-  #   environment:
-  #     MARIADB_DATABASE: ${DB_DATABASE:-}
-  #     MARIADB_USER: ${DB_USERNAME:-}
-  #     MARIADB_PASSWORD: ${DB_PASSWORD:-}
-  #     MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-}
-  #     MARIADB_CHARACTER_SET_SERVER: utf8mb4
-  #     MARIADB_COLLATION_SERVER: utf8mb4_unicode_ci
-  #   volumes:
-  #     - application-application-mariadb-data:/var/lib/mysql
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD",
-  #         "mariadb",
-  #         "--socket=/var/run/mysqld/mysqld.sock",
-  #         "--user=${DB_USERNAME:-}",
-  #         "--password=${DB_PASSWORD:-}",
-  #         "--execute=SELECT 1",
-  #       ]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 10
-  #     start_period: 30s
+      test:
+        [
+          "CMD",
+          "mariadb",
+          "--user=${DB_USERNAME:-application}",
+          "--password=${DB_PASSWORD:-application}",
+          "--execute=SELECT 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   application-application.redis:
-    container_name: application-application.redis
-    image: organisation/application-application.redis:latest
+    container_name: application-application-redis
+    image: webgrip/application-application-redis:latest
     pull_policy: never
     build:
       context: .
@@ -111,12 +96,15 @@ services:
       start_period: 5s
 
 volumes:
-  application-application-application-data:
-  application-application-postgres-data:
-  # application-application-mariadb-data:
+  application-application-application-storage-data:
+  application-application-application-public-data:
+
+  application-application-mariadb-data:
   application-application-redis-data:
+  certificate-data:
+    external: true
 
 networks:
   default:
     external: true
-    name: organisation
+    name: webgrip
