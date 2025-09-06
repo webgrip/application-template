@@ -6,7 +6,7 @@ concurrency:
 on:
   push:
     branches:
-      - 'main'
+      - '*'
     paths:
       - 'ops/**'
       - 'src/**'
@@ -14,66 +14,60 @@ on:
       - '.github/workflows/on_source_change.yml'
 
 jobs:
+  static-analysis:
+    name: 'Static Analysis'
+    uses: webgrip/workflows/.github/workflows/application-static-analysis.yml@main
+
+  test:
+    name: 'Test'
+    needs: [ static-analysis ]
+    if: >
+      always()
+      && needs.static-analysis.result == 'success'
+    uses: webgrip/workflows/.github/workflows/application-test.yml@main
+
   release:
     name: 'Release'
-    uses: webgrip/workflows/.github/workflows/semantic-release.yml@main
-    with:
-      use-bot-to-commit: true
+    needs: [ static-analysis, test ]
+    if: >
+      always()
+      && github.ref == 'refs/heads/main'
+      && needs.static-analysis.result == 'success'
+      && needs.test.result == 'success'
+    uses: webgrip/workflows/.github/workflows/application-release.yml@main
     secrets:
       WEBGRIP_CI_APP_ID: ${{ secrets.WEBGRIP_CI_APP_ID }}
       WEBGRIP_CI_APP_PRIVATE_KEY: ${{ secrets.WEBGRIP_CI_APP_PRIVATE_KEY }}
-
-  determine-changed-secrets:
-    name: "Secrets"
-    uses: webgrip/workflows/.github/workflows/determine-changed-directories.yml@main
-    with:
-      inside-dir: 'ops/secrets'
-      max-level: 1
-
-  deploy-changed-secrets:
-    name: "Deploy Changed Secrets"
-    needs: [ determine-changed-secrets ]
-    if: needs.determine-changed-secrets.outputs.matrix != '[]'
-    uses: webgrip/workflows/.github/workflows/helm-charts-deploy.yml@main
-    secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-      DIGITAL_OCEAN_API_KEY: ${{ secrets.DIGITAL_OCEAN_API_KEY }}
-      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-    with:
-      paths: ${{ needs.determine-changed-secrets.outputs.matrix }}
 
-  build:
-    name: 'Build'
-    needs: [ release ]
+  deploy:
+    name: 'Deploy'
+    uses: webgrip/workflows/.github/workflows/application-deploy.yml@main
+    needs: [ static-analysis, test, release ]
     if: >
       always()
+      && github.ref == 'refs/heads/main'
+      && needs.static-analysis.result == 'success'
+      && needs.test.result == 'success'
       && needs.release.result == 'success'
       && needs.release.outputs.version != ''
-    uses: webgrip/workflows/.github/workflows/docker-build-and-push.yml@main
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-    with:
-      docker-context: '.'
-      docker-file: './ops/docker/application/Dockerfile'
-      docker-tags: |
-        ${{github.repository_owner}}/${{ github.event.repository.name }}:latest
-        ${{github.repository_owner}}/${{ github.event.repository.name }}:${{ needs.release.outputs.version }}
-
-  deploy-application:
-    name: 'Deploy'
-    needs: [ release, build, deploy-changed-secrets ]
-    if: >
-      always()
-      && needs.build.result == 'success'
-    uses: webgrip/workflows/.github/workflows/helm-chart-deploy.yml@main
     secrets:
       DIGITAL_OCEAN_API_KEY: ${{ secrets.DIGITAL_OCEAN_API_KEY }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
     with:
+      version: ${{ needs.release.outputs.version }}
       environment: 'staging'
-      path: './ops/helm/${{ github.event.repository.name }}'
-      image_repository: ${{ github.repository }}
-      tag: ${{ needs.release.outputs.version }}
+
+  deploy-secrets:
+    name: 'Deploy Secrets'
+    if : >
+      always()
+      && github.ref == 'refs/heads/main'
+    uses: webgrip/workflows/.github/workflows/application-deploy-secrets.yml@main
+    secrets:
+      DIGITAL_OCEAN_API_KEY: ${{ secrets.DIGITAL_OCEAN_API_KEY }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
