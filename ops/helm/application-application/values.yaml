@@ -11,57 +11,58 @@ application:
     main:
       pod:
         securityContext:
-          fsGroup: 1000
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+          fsGroup: 1500
           fsGroupChangePolicy: OnRootMismatch
+
       containers:
         app:
           image:
             repository: docker.io/webgrip/application-application
             tag: "latest"
             pullPolicy: Always
-          resources:
-            requests: { cpu: "250m", memory: "256Mi" }
-            limits: { cpu: "500m", memory: "512Mi" }
-          probes:
-            readiness:
-              enabled: true
-              custom: true
-              spec:
-                exec:
-                  command:
-                    [
-                      "sh",
-                      "-c",
-                      "php -v >/dev/null && nc -z application-application-mariadb 3306",
-                    ]
-                initialDelaySeconds: 10
-                periodSeconds: 10
+          securityContext:
+            runAsUser: 1500
+            runAsGroup: 1500
+            allowPrivilegeEscalation: false
           env:
+            # App
+            - name: APP_NAME
+              value: application-application
             - name: APP_ENV
               value: production
             - name: APP_DEBUG
               value: "false"
             - name: APP_URL
               value: *url
-            - name: APP_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: application-application-secrets
-                  key: app-key
             - name: APP_LOCALE
               value: en
             - name: APP_FALLBACK_LOCALE
               value: en
             - name: APP_TIMEZONE
               value: Europe/Amsterdam
-            - name: APP_NAME
-              value: "application-application"
-            - name: DB_TYPE
-              value: mysql
-            - name: DB_CONNECTION
-              value: mysql
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: application-application-secrets
+                  key: app-key
+
             - name: DB_STRICT
               value: "false"
+            - name: REQUIRE_HTTPS
+              value: "true"
+            - name: TRUSTED_PROXIES
+              value: "**"
+
+            - name: LOG_CHANNEL
+              value: stderr
+            - name: LOG_LEVEL
+              value: info
+
+            - name: DB_CONNECTION
+              value: mysql
             - name: DB_HOST
               value: application-application-mariadb
             - name: DB_PORT
@@ -75,50 +76,97 @@ application:
                 secretKeyRef:
                   name: application-application-secrets
                   key: mariadb-password
+
+            - name: SESSION_DRIVER
+              value: redis
+            - name: CACHE_DRIVER
+              value: redis
+            - name: QUEUE_CONNECTION
+              value: redis
+            - name: REDIS_CLIENT
+              value: phpredis
+            - name: REDIS_PREFIX
+              value: application-application_
+            - name: REDIS_HOST
+              value: application-application-redis-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: application-application-secrets
+                  key: redis-password
+
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
                   name: application-application-secrets
                   key: api-secret
-            - name: REDIS_HOST
-              value: application-application-redis-master
-            - name: REDIS_PASSWORD
-              value: ""
-            - name: REDIS_PORT
-              value: "6379"
-            - name: REDIS_CLIENT
-              value: phpredis
-            - name: REDIS_PREFIX
-              value: application-application_
-            - name: TRUSTED_PROXIES
-              value: "**"
-            - name: FORCE_HTTPS
-              value: "true"
+            - name: UPDATE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: application-application-secrets
+                  key: update-secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          probes:
+            readiness:
+              enabled: true
+              custom: true
+              spec:
+                exec:
+                  command:
+                    - sh
+                    - -lc
+                    - >
+                      php -v >/dev/null &&
+                      nc -z 127.0.0.1 9000 &&
+                      nc -z application-application-mariadb 3306 &&
+                      nc -z application-application-redis-master 6379
+                initialDelaySeconds: 10
+                periodSeconds: 10
 
         web:
           image:
-            repository: nginx
-            tag: 1.29.1-alpine
-            pullPolicy: IfNotPresent
+            repository: nginxinc/nginx-unprivileged
+            tag: 1.29.1-alpine3.22-perl
+          securityContext:
+            runAsUser: 101
+            runAsGroup: 101
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
           resources:
-            requests: { cpu: "100m", memory: "128Mi" }
-            limits: { cpu: "300m", memory: "256Mi" }
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
           probes:
             liveness:
               enabled: true
               custom: true
               spec:
-                httpGet: { path: /health, port: http }
+                httpGet:
+                  path: /health
+                  port: http
                 initialDelaySeconds: 5
                 periodSeconds: 10
             readiness:
               enabled: true
               custom: true
               spec:
-                httpGet: { path: /health, port: http }
+                httpGet:
+                  path: /health
+                  port: http
                 initialDelaySeconds: 2
                 periodSeconds: 5
 
@@ -128,6 +176,7 @@ application:
       ports:
         http:
           port: 80
+          targetPort: http
 
   ingress:
     main:
@@ -135,7 +184,7 @@ application:
       className: ingress-traefik
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-traefik
-        # traefik.ingress.kubernetes.io/router.middlewares: "ingress-traefik-ryan-basic-auth@kubernetescrd"
+        traefik.ingress.kubernetes.io/router.middlewares: ingress-traefik-ryan-home-ip-allow-list@kubernetescrd
       hosts:
         - host: *hostname
           paths:
@@ -144,9 +193,9 @@ application:
                 identifier: main
                 port: http
       tls:
-        - hosts:
+        - secretName: letsencrypt-application-application
+          hosts:
             - *hostname
-          secretName: letsencrypt-application-application
 
   persistence:
     public:
@@ -155,81 +204,144 @@ application:
       accessMode: ReadWriteOnce
       size: 1Gi
       storageClass: do-block-storage
-      globalMounts:
-        - path: /var/www/app/public
+      advancedMounts:
+        main:
+          app:
+            - path: /var/www/app/public
+          web:
+            - path: /var/www/app/public
+              readOnly: true
+
     storage:
       type: persistentVolumeClaim
       enabled: true
       accessMode: ReadWriteOnce
       size: 2Gi
       storageClass: do-block-storage
-      globalMounts:
-        - path: /var/www/app/storage
+      advancedMounts:
+        main:
+          app:
+            - path: /var/www/app/storage
+          web:
+            - path: /var/www/app/storage
+              readOnly: true
+
     nginx-conf:
       type: configMap
       enabled: true
       name: application-application
-      globalMounts:
-        - path: /etc/nginx/conf.d
-          readOnly: true
+      advancedMounts:
+        main:
+          web:
+            - path: /etc/nginx/conf.d
+              readOnly: true
+
+    nginx-tmp:
+      type: emptyDir
+      enabled: true
+      advancedMounts:
+        main:
+          web:
+            - path: /tmp
 
   configMaps:
     nginx:
       enabled: true
       data:
         default.conf: |
-          map $http_x_forwarded_proto $fastcgi_https {
-            default '';
-            https on;
-          }
+          map $http_x_forwarded_proto $fastcgi_https { default off; https on; }
+
+          gzip on;
+          gzip_types application/javascript text/javascript application/json text/css text/plain application/xml;
+          gzip_proxied any;
+          gzip_min_length 1024;
+
           server {
-            listen 80;
+            listen 8080;
             root /var/www/app/public;
             index index.php index.html;
-            location /health { return 200 'ok'; add_header Content-Type text/plain; }
-            location / {
-              try_files $uri /index.php?$query_string;
+
+            location = /health { return 200 'ok'; add_header Content-Type text/plain; }
+
+            location ~* \.(?:css|js|mjs|map|png|jpg|jpeg|gif|ico|svg|json|webmanifest|woff|woff2|ttf|eot)$ {
+              try_files $uri =404;
+              access_log off;
+              expires 1y;
+              add_header Cache-Control "public, immutable";
             }
-            location ~ \.php$ {
+
+            location ^~ /storage/ {
+              alias /var/www/app/storage/app/public/;
+              try_files $uri =404;
+            }
+
+            location / {
+              try_files $uri $uri/ /index.php?$query_string;
+            }
+
+            location = /index.php {
               include fastcgi_params;
               fastcgi_pass 127.0.0.1:9000;
-              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-              fastcgi_param HTTP_X_FORWARDED_PROTO $http_x_forwarded_proto;
-              fastcgi_param HTTP_X_FORWARDED_HOST  $http_x_forwarded_host;
-              fastcgi_param HTTP_X_FORWARDED_FOR   $http_x_forwarded_for;
-              fastcgi_param HTTPS                  $fastcgi_https;
+              fastcgi_param SCRIPT_FILENAME           $document_root$fastcgi_script_name;
+              fastcgi_param HTTP_HOST                 $host;
+              fastcgi_param SERVER_NAME               $host;
+              fastcgi_param SERVER_PORT               $server_port;
+              fastcgi_param HTTPS                     $fastcgi_https;
+              fastcgi_param HTTP_X_FORWARDED_PROTO    $http_x_forwarded_proto;
+              fastcgi_param HTTP_X_FORWARDED_HOST     $http_x_forwarded_host;
+              fastcgi_param HTTP_X_FORWARDED_FOR      $proxy_add_x_forwarded_for;
+              fastcgi_read_timeout 600;
+              fastcgi_send_timeout 600;
+              fastcgi_connect_timeout 60;
             }
+
+            location ~ \.php$ { return 403; }
           }
 
 redis:
+  enabled: true
   image:
     repository: bitnamilegacy/redis
     tag: "8.2.1"
     pullPolicy: IfNotPresent
-  architecture: replication
+  architecture: standalone
   auth:
-    enabled: false
+    enabled: true
+    existingSecret: application-application-secrets
+    existingSecretPasswordKey: redis-password
   master:
     persistence:
       enabled: true
       size: 1Gi
-  replica:
-    replicaCount: 0
+    disableCommands: [FLUSHALL, CONFIG, KEYS]
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+    limits:
+      cpu: "150m"
+      memory: "256Mi"
 
 mariadb:
+  enabled: true
   image:
     repository: bitnamilegacy/mariadb
     tag: "12.0.2"
     pullPolicy: IfNotPresent
-  enabled: true
+  architecture: standalone
   auth:
-    # rootPassword: "" # ignored when existingSecret is set
+    existingSecret: application-application-secrets
     database: application-application
     username: application-application
-    # password: "" # ignored when existingSecret is set
-    existingSecret: application-application-secrets
   primary:
     persistence:
       enabled: true
-      storageClass: do-block-storage
       size: 2Gi
+      storageClass: do-block-storage
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "300m"
+        memory: "512Mi"

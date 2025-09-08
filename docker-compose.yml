@@ -26,7 +26,7 @@ services:
       - application-application-application-storage-data:/var/www/app/storage
 
   application-application.nginx:
-    container_name: application-application-nginx
+    container_name: application-application.nginx
     image: webgrip/application-application-nginx:latest
     pull_policy: never
     build:
@@ -41,7 +41,7 @@ services:
       - application-application-application-public-data:/var/www/app/public:ro
 
   application-application.mariadb:
-    container_name: application-application-mariadb
+    container_name: application-application.mariadb
     image: webgrip/application-application-mariadb:latest
     build:
       context: .
@@ -79,7 +79,7 @@ services:
       start_period: 30s
 
   application-application.redis:
-    container_name: application-application-redis
+    container_name: application-application.redis
     image: webgrip/application-application-redis:latest
     pull_policy: never
     build:
