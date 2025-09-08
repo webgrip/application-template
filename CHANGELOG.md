@@ -1,3 +1,14 @@
+## [1.6.1](https://github.com/webgrip/application-template/compare/1.6.0...1.6.1) (2025-09-08)
+
+
+### Bug Fixes
+
+* Downstream changes that use the new on_source_change ([c7d8632](https://github.com/webgrip/application-template/commit/c7d863286d2bd5d688011bb1eac809a4eaa87927))
+* downstream docker changes ([f09f22f](https://github.com/webgrip/application-template/commit/f09f22fa4f46645d0f2d946de13289508ae22b43))
+* downstream values ([1e442d2](https://github.com/webgrip/application-template/commit/1e442d2f212438cb8da22e59fdbf053ebe0843bb))
+* fixed values.yaml with new downstream correct settings ([8ceff3e](https://github.com/webgrip/application-template/commit/8ceff3ef7656f31dc84ad7337c6c528a7fdf83c2))
+* update version in package.json and Chart.yaml ([82c82e9](https://github.com/webgrip/application-template/commit/82c82e94516706f774d0587d35b677480bbf1a5a))
+
 # [1.6.0](https://github.com/webgrip/application-template/compare/1.5.1...1.6.0) (2025-09-03)
 
 
