@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/webgrip/application-template/compare/1.6.1...1.6.2) (2025-09-11)
+
+
+### Bug Fixes
+
+* added npm no publish to releaserc ([3624f85](https://github.com/webgrip/application-template/commit/3624f8548e4cee2acca708db07425a0eef682d5b))
+
 ## [1.6.1](https://github.com/webgrip/application-template/compare/1.6.0...1.6.1) (2025-09-08)
 
 
