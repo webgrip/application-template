@@ -11,7 +11,6 @@ application:
     main:
       pod:
         securityContext:
-          runAsNonRoot: true
           seccompProfile:
             type: RuntimeDefault
           fsGroup: 1500
@@ -23,10 +22,46 @@ application:
             repository: docker.io/webgrip/application-application
             tag: "latest"
             pullPolicy: Always
-          securityContext:
-            runAsUser: 1500
-            runAsGroup: 1500
-            allowPrivilegeEscalation: false
+          # securityContext:
+          #   runAsUser: 1500
+          #   runAsGroup: 1500
+          #   allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          probes:
+            readiness:
+              enabled: true
+              custom: true
+              spec:
+                exec:
+                  command:
+                    - sh
+                    - -lc
+                    - >
+                      php -v >/dev/null && \
+                      nc -z application-application-mariadb 3306 && \
+                      nc -z application-application-redis-master 6379 && \
+                      nc -z 127.0.0.1 4200
+                initialDelaySeconds: 10
+                periodSeconds: 10
+            liveness:
+              enabled: true
+              custom: true
+              spec:
+                exec:
+                  command:
+                    - sh
+                    - -lc
+                    - >
+                      php -v >/dev/null && \
+                      nc -z application-application-mariadb 3306 && \
+                      nc -z application-application-redis-master 6379 && \
+                      nc -z 127.0.0.1 4200
           env:
             # App
             - name: APP_NAME
@@ -64,7 +99,7 @@ application:
             - name: DB_CONNECTION
               value: mysql
             - name: DB_HOST
-              value: application-application-mariadb
+              value: application-application-mariadb.application-application.svc.cluster.local
             - name: DB_PORT
               value: "3306"
             - name: DB_DATABASE
@@ -88,7 +123,7 @@ application:
             - name: REDIS_PREFIX
               value: application-application_
             - name: REDIS_HOST
-              value: application-application-redis-master
+              value: application-application-redis-master.application-application.svc.cluster.local
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_PASSWORD
@@ -107,29 +142,6 @@ application:
                 secretKeyRef:
                   name: application-application-secrets
                   key: update-secret
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "512Mi"
-            limits:
-              cpu: "1000m"
-              memory: "1Gi"
-          probes:
-            readiness:
-              enabled: true
-              custom: true
-              spec:
-                exec:
-                  command:
-                    - sh
-                    - -lc
-                    - >
-                      php -v >/dev/null &&
-                      nc -z 127.0.0.1 9000 &&
-                      nc -z application-application-mariadb 3306 &&
-                      nc -z application-application-redis-master 6379
-                initialDelaySeconds: 10
-                periodSeconds: 10
 
         web:
           image:
@@ -175,6 +187,7 @@ application:
       controller: main
       ports:
         http:
+          enabled: true
           port: 80
           targetPort: http
 
@@ -204,99 +217,6 @@ application:
       accessMode: ReadWriteOnce
       size: 1Gi
       storageClass: do-block-storage
-      advancedMounts:
-        main:
-          app:
-            - path: /var/www/app/public
-          web:
-            - path: /var/www/app/public
-              readOnly: true
-
-    storage:
-      type: persistentVolumeClaim
-      enabled: true
-      accessMode: ReadWriteOnce
-      size: 2Gi
-      storageClass: do-block-storage
-      advancedMounts:
-        main:
-          app:
-            - path: /var/www/app/storage
-          web:
-            - path: /var/www/app/storage
-              readOnly: true
-
-    nginx-conf:
-      type: configMap
-      enabled: true
-      name: application-application
-      advancedMounts:
-        main:
-          web:
-            - path: /etc/nginx/conf.d
-              readOnly: true
-
-    nginx-tmp:
-      type: emptyDir
-      enabled: true
-      advancedMounts:
-        main:
-          web:
-            - path: /tmp
-
-  configMaps:
-    nginx:
-      enabled: true
-      data:
-        default.conf: |
-          map $http_x_forwarded_proto $fastcgi_https { default off; https on; }
-
-          gzip on;
-          gzip_types application/javascript text/javascript application/json text/css text/plain application/xml;
-          gzip_proxied any;
-          gzip_min_length 1024;
-
-          server {
-            listen 8080;
-            root /var/www/app/public;
-            index index.php index.html;
-
-            location = /health { return 200 'ok'; add_header Content-Type text/plain; }
-
-            location ~* \.(?:css|js|mjs|map|png|jpg|jpeg|gif|ico|svg|json|webmanifest|woff|woff2|ttf|eot)$ {
-              try_files $uri =404;
-              access_log off;
-              expires 1y;
-              add_header Cache-Control "public, immutable";
-            }
-
-            location ^~ /storage/ {
-              alias /var/www/app/storage/app/public/;
-              try_files $uri =404;
-            }
-
-            location / {
-              try_files $uri $uri/ /index.php?$query_string;
-            }
-
-            location = /index.php {
-              include fastcgi_params;
-              fastcgi_pass 127.0.0.1:9000;
-              fastcgi_param SCRIPT_FILENAME           $document_root$fastcgi_script_name;
-              fastcgi_param HTTP_HOST                 $host;
-              fastcgi_param SERVER_NAME               $host;
-              fastcgi_param SERVER_PORT               $server_port;
-              fastcgi_param HTTPS                     $fastcgi_https;
-              fastcgi_param HTTP_X_FORWARDED_PROTO    $http_x_forwarded_proto;
-              fastcgi_param HTTP_X_FORWARDED_HOST     $http_x_forwarded_host;
-              fastcgi_param HTTP_X_FORWARDED_FOR      $proxy_add_x_forwarded_for;
-              fastcgi_read_timeout 600;
-              fastcgi_send_timeout 600;
-              fastcgi_connect_timeout 60;
-            }
-
-            location ~ \.php$ { return 403; }
-          }
 
 redis:
   enabled: true
