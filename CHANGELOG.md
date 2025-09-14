@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/webgrip/application-template/compare/1.6.2...1.6.3) (2025-09-14)
+
+
+### Bug Fixes
+
+* moved some stuff around ([2f63135](https://github.com/webgrip/application-template/commit/2f63135d7fbbf32bbc0ed389afba8df2bea2991e))
+
 ## [1.6.2](https://github.com/webgrip/application-template/compare/1.6.1...1.6.2) (2025-09-11)
 
 
