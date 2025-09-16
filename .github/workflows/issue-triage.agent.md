@@ -1,7 +1,7 @@
 ---
 on:
   issues:
-    types: [opened, reopened]
+    types: [opened, reopened, labeled]
   reaction: eyes
 
 permissions: write-all
@@ -19,6 +19,11 @@ safe-outputs:
 tools:
   web-fetch:
   web-search:
+
+if:
+  github.event.action == 'opened' ||
+  github.event.action == 'reopened' ||
+  (github.event.action == 'labeled' && github.event.label.name == 'needs-triage')
 
 timeout_minutes: 10
 ---
