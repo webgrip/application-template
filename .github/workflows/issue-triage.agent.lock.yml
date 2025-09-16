@@ -16,6 +16,9 @@ concurrency:
 
 run-name: "Agentic Triage"
 
+env:
+  GITHUB_AW_REQUIRED_ROLES: admin,maintain,none
+
 jobs:
   task:
     runs-on: ubuntu-latest
@@ -304,7 +307,7 @@ jobs:
   agentic-triage:
     needs: task
     runs-on: ubuntu-latest
-    permissions: read-all
+    permissions: write-all
     outputs:
       output: ${{ steps.collect_output.outputs.output }}
     steps:

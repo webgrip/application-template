@@ -4,7 +4,10 @@ on:
     types: [opened, reopened]
   reaction: eyes
 
-permissions: read-all
+permissions: write-all
+
+env:
+  GITHUB_AW_REQUIRED_ROLES: admin,maintain,none
 
 network: defaults
 
