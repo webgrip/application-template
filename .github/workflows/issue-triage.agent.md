@@ -26,7 +26,7 @@ engine:
   env:
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_CI }}
 
-if: >
+if: 
   github.event.action == 'opened' ||
   github.event.action == 'reopened' ||
   (github.event.action == 'labeled' && github.event.label.name == 'needs:triage')

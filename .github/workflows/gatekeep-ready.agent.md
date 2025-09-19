@@ -4,8 +4,8 @@ on:
     types: [labeled]
   reaction: eyes
 
-if: >
-  github.event.action == 'labeled' && github.event.label.name == 'check-ready'
+if: 
+  github.event.action == 'labeled' && github.event.label.name == 'needs:evaluation'
 
 permissions: write-all
 

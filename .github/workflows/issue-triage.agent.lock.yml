@@ -20,7 +20,8 @@ run-name: "Agentic Triage"
 jobs:
   task:
     if: >
-      github.event.action == 'opened' || github.event.action == 'reopened' || (github.event.action == 'labeled' && github.event.label.name == 'needs: triage')
+      github.event.action == 'opened' || github.event.action == 'reopened' || (github.event.action == 'labeled' &&
+      github.event.label.name == 'needs:triage')
     runs-on: ubuntu-latest
     permissions:
       actions: write  # Required for github.rest.actions.cancelWorkflowRun()
@@ -307,7 +308,8 @@ jobs:
   agentic-triage:
     needs: task
     if: >
-      github.event.action == 'opened' || github.event.action == 'reopened' || (github.event.action == 'labeled' && github.event.label.name == 'needs: triage')
+      github.event.action == 'opened' || github.event.action == 'reopened' || (github.event.action == 'labeled' &&
+      github.event.label.name == 'needs:triage')
     runs-on: ubuntu-latest
     permissions: write-all
     outputs:

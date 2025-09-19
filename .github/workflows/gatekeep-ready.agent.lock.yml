@@ -17,8 +17,7 @@ run-name: "DoR/DoD Guardian for GitHub and DevOps"
 
 jobs:
   task:
-    if: >
-      github.event.action == 'labeled' && github.event.label.name == 'check-ready'
+    if: github.event.action == 'labeled' && github.event.label.name == 'needs:evaluation'
     runs-on: ubuntu-latest
     permissions:
       actions: write  # Required for github.rest.actions.cancelWorkflowRun()
@@ -304,8 +303,7 @@ jobs:
 
   dor-dod-guardian-for-github-and-devops:
     needs: task
-    if: >
-      github.event.action == 'labeled' && github.event.label.name == 'check-ready'
+    if: github.event.action == 'labeled' && github.event.label.name == 'needs:evaluation'
     runs-on: ubuntu-latest
     permissions: write-all
     outputs:
