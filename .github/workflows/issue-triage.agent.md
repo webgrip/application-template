@@ -6,24 +6,30 @@ on:
 
 permissions: write-all
 
-env:
-  GITHUB_AW_REQUIRED_ROLES: admin,maintain,none
+roles: [admin, maintainer, write]
+
 
 network: defaults
 
 safe-outputs:
-  add-issue-label:
+  add-labels:
     max: 5
-  add-issue-comment:
+  add-comment:
 
 tools:
   web-fetch:
   web-search:
 
-if:
+engine:
+  id: codex
+  model: gpt-5
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_CI }}
+
+if: >
   github.event.action == 'opened' ||
   github.event.action == 'reopened' ||
-  (github.event.action == 'labeled' && github.event.label.name == 'needs-triage')
+  (github.event.action == 'labeled' && github.event.label.name == 'needs: triage')
 
 timeout_minutes: 10
 ---
