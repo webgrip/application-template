@@ -1,8 +1,9 @@
-# application-application AI directives
+# invoiceninja-application AI directives
 
-This repository contains the code and infrastructure for the application-application service. The following directives outline the key practices and standards for working with this codebase.
+This repository contains the code and infrastructure for the invoiceninja-application service. The following directives outline the key practices and standards for working with this codebase.
 
 ## Conventions
+
 - Follow [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
 - Use [Semantic Versioning](https://semver.org/) for versioning releases.
 - Document all architectural decisions in ADRs.
@@ -11,6 +12,7 @@ This repository contains the code and infrastructure for the application-applica
 - Make atomic commits. Intent matters—each commit should represent a single logical change.
 
 ## Major thought influences
+
 | Thinker              | Core Idea We Adopt                      |
 | -------------------- | --------------------------------------- |
 | **Kent Beck**        | Test‑Driven Development, Small Releases |
@@ -21,6 +23,7 @@ This repository contains the code and infrastructure for the application-applica
 These thinkers influence our approach to software development, take their philosophies to heart, and apply them in our work.
 
 ## Repository Structure
+
 - `docs/adrs`: Architectural Decision Records
 - `docs/techdocs`: Custom mkdocs documentation, based on Spotify's techdocs
 - `ops/docker`: Dockerfiles for different parts of the application live here
@@ -39,5 +42,6 @@ These thinkers influence our approach to software development, take their philos
 
 ## Detailed information about uncommon patterns in this repository
 
-#### Secrets & Encryption
+### Secrets & Encryption
+
 - Encrypted secrets are managed with age/sops. Plaintext secrets live under `ops/secrets/*/values.dec.yaml` and are encrypted with `make encrypt-secrets` (see `README.md`).

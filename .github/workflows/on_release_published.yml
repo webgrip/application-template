@@ -1,0 +1,39 @@
+name: '[Workflow] On Release Published'
+
+concurrency:
+  group: release-${{ github.ref }}
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release-distribute:
+    name: 'Release'
+    uses: webgrip/workflows/.github/workflows/application-release-distribute.yml@main
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+    with:
+      version: '${{ github.event.release.tag_name }}'
+
+  deploy:
+    name: 'Deploy'
+    needs: [release-distribute]
+    uses: webgrip/workflows/.github/workflows/application-deploy.yml@main
+    secrets:
+      DIGITAL_OCEAN_API_KEY: ${{ secrets.DIGITAL_OCEAN_API_KEY }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+    with:
+      version: '${{ github.event.release.tag_name }}'
+      environment: 'staging'
+
+  deploy-secrets:
+    name: 'Deploy Secrets'
+    uses: webgrip/workflows/.github/workflows/application-deploy-secrets.yml@main
+    secrets:
+      DIGITAL_OCEAN_API_KEY: ${{ secrets.DIGITAL_OCEAN_API_KEY }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}

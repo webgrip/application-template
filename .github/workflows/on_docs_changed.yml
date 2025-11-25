@@ -3,7 +3,7 @@ name: '[Workflow] On Documentation Change'
 on:
   push:
     branches:
-      - '*'
+      - 'main'
     paths:
       - 'docs/techdocs/**'
       - '.github/workflows/on_docs_change.yml'
