@@ -146,7 +146,7 @@ application:
         web:
           image:
             repository: nginxinc/nginx-unprivileged
-            tag: 1.29.1-alpine3.22-perl
+            tag: 1.29.3-alpine3.22-perl
           securityContext:
             runAsUser: 101
             runAsGroup: 101
