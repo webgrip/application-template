@@ -1,3 +1,3 @@
-FROM mariadb:12.0.2-noble
+FROM mariadb:12.1.2-noble
 
 ENV MYSQL_INITDB_SKIP_TZINFO=1

@@ -1,2 +1,2 @@
-FROM postgres:17.6-alpine3.22
+FROM postgres:17.7-alpine3.22
 
