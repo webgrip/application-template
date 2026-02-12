@@ -146,7 +146,7 @@ application:
         web:
           image:
             repository: nginxinc/nginx-unprivileged
-            tag: 1.29.3-alpine3.22-perl
+            tag: 1.29.3-alpine3.22-perl@sha256:f1444b4f78f91b0c42dedc01b55972f4d759e7fcbabdf5d5a5e2f0690234eef4
           securityContext:
             runAsUser: 101
             runAsGroup: 101
@@ -222,7 +222,7 @@ redis:
   enabled: true
   image:
     repository: bitnamilegacy/redis
-    tag: "8.2.1"
+    tag: "8.2.1@sha256:25bf63f3caf75af4628c0dfcf39859ad1ac8abe135be85e99699f9637b16dc28"
     pullPolicy: IfNotPresent
   architecture: standalone
   auth:
@@ -246,7 +246,7 @@ mariadb:
   enabled: true
   image:
     repository: bitnamilegacy/mariadb
-    tag: "12.0.2"
+    tag: "12.0.2@sha256:888cdaae3cb996c4d28f7916106511de553545929957dd1d35221112df631e19"
     pullPolicy: IfNotPresent
   architecture: standalone
   auth:
