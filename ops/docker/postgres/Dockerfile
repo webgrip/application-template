@@ -1,2 +1,2 @@
-FROM postgres:17.6-alpine3.22
+FROM postgres:17.7-alpine3.22@sha256:6b591f995765a189e69276dd55e0b362342d65d10d0359bb1fab67bc3391f20f
 
