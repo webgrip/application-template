@@ -1156,7 +1156,7 @@ jobs:
               .write();
       - name: Upload agentic run info
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: aw_info.json
           path: /tmp/aw_info.json
@@ -1206,7 +1206,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
       - name: Upload agentic output file
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: safe_output.jsonl
           path: ${{ env.GITHUB_AW_SAFE_OUTPUTS }}
@@ -2154,7 +2154,7 @@ jobs:
             await main();
       - name: Upload sanitized agent output
         if: always() && env.GITHUB_AW_AGENT_OUTPUT
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: agent_output.json
           path: ${{ env.GITHUB_AW_AGENT_OUTPUT }}
@@ -2437,7 +2437,7 @@ jobs:
             main();
       - name: Upload agent logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dor-dod-guardian-for-github-and-devops.log
           path: /tmp/dor-dod-guardian-for-github-and-devops.log
