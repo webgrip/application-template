@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Check team membership for workflow
         id: check-team-member
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           GITHUB_AW_REQUIRED_ROLES: admin,maintainer,write
         with:
@@ -129,7 +129,7 @@ jobs:
     steps:
       - name: Add eyes reaction to the triggering item
         id: react
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           GITHUB_AW_REACTION: eyes
         with:
@@ -325,7 +325,7 @@ jobs:
         run: npm install -g @openai/codex
       - name: Setup agent output
         id: setup_agent_output
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             function main() {
@@ -944,7 +944,7 @@ jobs:
         env:
           GITHUB_AW_PROMPT: /tmp/aw-prompts/prompt.txt
       - name: Generate agentic run info
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
@@ -1042,7 +1042,7 @@ jobs:
           if-no-files-found: warn
       - name: Ingest agent output
         id: collect_output
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           GITHUB_AW_SAFE_OUTPUTS: ${{ env.GITHUB_AW_SAFE_OUTPUTS }}
           GITHUB_AW_SAFE_OUTPUTS_CONFIG: "{\"add-comment\":{},\"add-labels\":{}}"
@@ -1990,7 +1990,7 @@ jobs:
           if-no-files-found: warn
       - name: Parse agent logs for step summary
         if: always()
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           GITHUB_AW_AGENT_OUTPUT: /tmp/agentic-triage.log
         with:
@@ -2273,7 +2273,7 @@ jobs:
           if-no-files-found: warn
       - name: Validate agent logs for errors
         if: always()
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           GITHUB_AW_AGENT_OUTPUT: /tmp/agentic-triage.log
           GITHUB_AW_ERROR_PATTERNS: "[{\"pattern\":\"\\\\[(\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2})\\\\]\\\\s+stream\\\\s+(error):\\\\s+(.+)\",\"level_group\":2,\"message_group\":3,\"description\":\"Codex stream errors with timestamp\"},{\"pattern\":\"\\\\[(\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2})\\\\]\\\\s+(ERROR):\\\\s+(.+)\",\"level_group\":2,\"message_group\":3,\"description\":\"Codex ERROR messages with timestamp\"},{\"pattern\":\"\\\\[(\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2})\\\\]\\\\s+(WARN|WARNING):\\\\s+(.+)\",\"level_group\":2,\"message_group\":3,\"description\":\"Codex warning messages with timestamp\"}]"
@@ -2438,7 +2438,7 @@ jobs:
     steps:
       - name: Add Issue Comment
         id: add_comment
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           GITHUB_AW_AGENT_OUTPUT: ${{ needs.agentic-triage.outputs.output }}
         with:
@@ -2640,7 +2640,7 @@ jobs:
     steps:
       - name: Add Labels
         id: add_labels
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           GITHUB_AW_AGENT_OUTPUT: ${{ needs.agentic-triage.outputs.output }}
           GITHUB_AW_LABELS_ALLOWED: ""
