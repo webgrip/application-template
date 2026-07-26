@@ -10,8 +10,7 @@ on:
     paths:
       - 'ops/**'
       - 'src/**'
-      - '.releaserc.json'
-      - '.releaserc.js'
+      - '.releaserc.cjs'
       - '.github/workflows/on_source_change.yml'
       - '.github/workflows/on_release_published.yml'
 
